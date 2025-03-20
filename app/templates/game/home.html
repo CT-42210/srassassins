@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Game Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1 class="display-5">Game Dashboard</h1>
+        <p class="lead">Welcome, {{ current_user.name }}!</p>
+    </div>
+</div>
+
+<!-- Game Info Banner -->
+<div class="card bg-dark text-white mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                <h4>Round {{ game_state.round_number }}</h4>
+                {% if round_end %}
+                <small id="round-timer" data-end="{{ round_end.isoformat() }}">
+                    Ends in: <span id="round-countdown">Loading...</span>
+                </small>
+                {% endif %}
+            </div>
+            <div class="col-md-4 text-center">
+                <h4>Teams Alive: {{ alive_teams }}</h4>
+            </div>
+            <div class="col-md-4 text-center">
+                <h4>Players Alive: {{ alive_players }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Team Information -->
+    <div class="col-md-5">
+        <div class="team-info">
+            <h3>Team {{ team.name }}</h3>
+            {% if team.photo_path %}
+            <div class="text-center my-3">
+                <img src="{{ url_for('static', filename=team.photo_path) }}" alt="Team Photo" class="img-fluid rounded" style="max-height: 200px;">
+            </div>
+            {% endif %}
+            
+            <div class="team-status mb-3">
+                <h5>Team Status: 
+                    <span class="player-status {% if team.is_alive %}status-alive{% else %}status-dead{% endif %}">
+                        {{ team.state|upper }}
+                    </span>
+                </h5>
+                {% if team.is_alive %}
+                <p>Eliminations: {{ team.eliminations }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="player-info mb-3">
+                <h5>Your Status:</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <h6>{{ current_user.name }}</h6>
+                        <span class="player-status {% if current_user.is_alive %}status-alive{% else %}status-dead{% endif %}">
+                            {{ 'ALIVE' if current_user.is_alive else 'ELIMINATED' }}
+                        </span>
+                        
+                        {% if not current_user.is_alive and current_user.obituary %}
+                        <div class="obituary mt-2">
+                            {% set obituary = current_user.get_obituary() %}
+                            <p>Eliminated in Round {{ obituary.round }} by {{ obituary.killer }}.</p>
+                            <p>Time of elimination: {{ obituary.time|replace('T', ' ') }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            {% if teammate %}
+            <div class="player-info mb-3">
+                <h5>Teammate Status:</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <h6>{{ teammate.name }}</h6>
+                        <span class="player-status {% if teammate.is_alive %}status-alive{% else %}status-dead{% endif %}">
+                            {{ 'ALIVE' if teammate.is_alive else 'ELIMINATED' }}
+                        </span>
+                        
+                        {% if not teammate.is_alive and teammate.obituary %}
+                        <div class="obituary mt-2">
+                            {% set obituary = teammate.get_obituary() %}
+                            <p>Eliminated in Round {{ obituary.round }} by {{ obituary.killer }}.</p>
+                            <p>Time of elimination: {{ obituary.time|replace('T', ' ') }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-lg">Sign Out</a>
+        </div>
+    </div>
+    
+    <!-- Target Information -->
+    <div class="col-md-7">
+        <!-- Obfuscation Toggle -->
+        <div class="obfuscation-toggle form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="obfuscation-toggle">
+            <label class="form-check-label" for="obfuscation-toggle">
+                Show Secure Information
+            </label>
+        </div>
+        
+        <div class="secure-section blurred">
+            {% if target_team and team.is_alive %}
+                <h3>Your Target</h3>
+                <div class="target-info">
+                    <h4>Team {{ target_team.name }}</h4>
+                    <p>Status: 
+                        <span class="player-status {% if target_team.is_alive %}status-alive{% else %}status-dead{% endif %}">
+                            {{ target_team.state|upper }}
+                        </span>
+                    </p>
+                    
+                    <h5 class="mt-4">Target Players:</h5>
+                    {% for player in target_players %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>{{ player.name }}</h6>
+                                    <p class="mb-0">Status: 
+                                        <span class="player-status {% if player.is_alive %}status-alive{% else %}status-dead{% endif %}">
+                                            {{ 'ALIVE' if player.is_alive else 'ELIMINATED' }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    {% if player.is_alive %}
+                                    <h6>Contact Info:</h6>
+                                    <p>Address: {{ player.address }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if target_team.is_alive and current_user.is_alive and team.is_alive %}
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('game.submit_kill') }}" class="btn btn-primary">Submit a Kill</a>
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    {% if not team.is_alive %}
+                    <p>Your team has been eliminated from the game.</p>
+                    {% else %}
+                    <p>You have not been assigned a target yet. Targets will be assigned at the start of the next round.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Game Actions -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h4>Game Actions</h4>
+                <div class="row mt-3">
+                    {% if team.is_alive and current_user.is_alive %}
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('game.submit_kill') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-crosshairs me-2"></i> Submit Kill
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('game.voting') }}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-vote-yea me-2"></i> Voting
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('main.rules') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-book me-2"></i> Rules
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('main.leaderboard') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-trophy me-2"></i> Leaderboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Countdown timer for round end
+    const roundTimer = document.getElementById('round-timer');
+    const roundCountdown = document.getElementById('round-countdown');
+    
+    if (roundTimer && roundCountdown) {
+        const endTime = new Date(roundTimer.dataset.end).getTime();
+        
+        const updateTimer = function() {
+            // Get current date and time
+            const now = new Date().getTime();
+            
+            // Find the time difference
+            const timeDiff = endTime - now;
+            
+            if (timeDiff > 0) {
+                // Time calculations
+                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+                
+                // Format output
+                let timeStr = '';
+                if (days > 0) {
+                    timeStr += `${days}d `;
+                }
+                timeStr += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                roundCountdown.textContent = timeStr;
+            } else {
+                roundCountdown.textContent = 'Round ending...';
+            }
+        };
+        
+        // Update immediately and then every second
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    }
+</script>
+{% endblock %}

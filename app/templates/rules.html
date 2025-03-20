@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Rules{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="display-4 mb-4">Official Rules</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h2>Game Overview</h2>
+                    <p>Senior Assassin is a game of stealth, strategy, and survival. Each team is assigned another team as their target. The goal is to "eliminate" all members of your target team using water-based weapons. The last team standing wins.</p>
+                    
+                    <hr>
+                    
+                    <h2>Teams</h2>
+                    <ul>
+                        <li>Teams can consist of either one or two players.</li>
+                        <li>All team members must be seniors at our high school.</li>
+                        <li>Once teams are formed, they cannot be changed.</li>
+                        <li>Each team must have a team name and photo for identification.</li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h2>Game Rounds</h2>
+                    <ul>
+                        <li>The game is divided into multiple rounds.</li>
+                        <li>At the beginning of each round, teams are assigned a new target.</li>
+                        <li>Rounds have a specific start and end time, which will be announced.</li>
+                        <li>If a team is eliminated but their team has at least one surviving player, they will be revived at the start of the next round.</li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h2>Elimination Rules</h2>
+                    <ol>
+                        <li><strong>Permitted weapons:</strong> Water guns, water balloons, and other water-based tools.</li>
+                        <li><strong>To eliminate a player:</strong> You must hit them with water and say "You've been eliminated" or similar phrase.</li>
+                        <li><strong>Video proof:</strong> All eliminations must be recorded on video as proof.</li>
+                        <li><strong>Safe zones:</strong>
+                            <ul>
+                                <li>School property during school hours</li>
+                                <li>Places of employment during work hours</li>
+                                <li>Inside vehicles</li>
+                                <li>Bathrooms</li>
+                                <li>Religious services</li>
+                                <li>School-sponsored events</li>
+                            </ul>
+                        </li>
+                        <li><strong>Team elimination:</strong> A team is eliminated when all its members have been eliminated.</li>
+                    </ol>
+                    
+                    <hr>
+                    
+                    <h2>Kill Confirmation Process</h2>
+                    <ol>
+                        <li>After eliminating a player, the attacker must submit a kill confirmation through the game portal.</li>
+                        <li>The submission must include a video of the elimination.</li>
+                        <li>Other players in the game will vote to confirm or reject the elimination.</li>
+                        <li>A minimum of {{ game_state.voting_threshold }} votes is required to confirm or reject the elimination.</li>
+                        <li>Invalid eliminations (e.g., in safe zones, using non-approved weapons) will be rejected.</li>
+                    </ol>
+                    
+                    <hr>
+                    
+                    <h2>Safety Guidelines</h2>
+                    <ol>
+                        <li>Never trespass on private property.</li>
+                        <li>Never engage in dangerous behavior (e.g., chasing in traffic, climbing buildings).</li>
+                        <li>Water weapons should not be visible in public places where they might cause alarm.</li>
+                        <li>No eliminations while driving or that would distract a driver.</li>
+                        <li>Be respectful of bystanders and public spaces.</li>
+                    </ol>
+                    
+                    <hr>
+                    
+                    <h2>Sportsmanship</h2>
+                    <ol>
+                        <li>Be honest about eliminations.</li>
+                        <li>Accept eliminations gracefully.</li>
+                        <li>Vote fairly on kill confirmations.</li>
+                        <li>No harassment or intimidation of other players.</li>
+                        <li>No destruction of property or disruptive behavior.</li>
+                    </ol>
+                    
+                    <hr>
+                    
+                    <h2>Winning the Game</h2>
+                    <p>The last team standing wins the game and will receive recognition and bragging rights!</p>
+                    
+                    <hr>
+                    
+                    <h2>Admin Decisions</h2>
+                    <p>The game administrators have final say on all disputes. Administrators may remove players from the game for rule violations or unsportsmanlike conduct.</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('main.index') }}" class="btn btn-primary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

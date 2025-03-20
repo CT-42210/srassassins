@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - About & Help{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="display-4 mb-4">About & Help</h1>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h2 class="h4 mb-0">About Senior Assassin</h2>
+                        </div>
+                        <div class="card-body">
+                            <p>Senior Assassin is a traditional game played by high school seniors around the country. It's a fun way to create lasting memories during your final year of high school.</p>
+                            
+                            <p>Our game is organized by senior class representatives and operates independently from the school. The game is designed to be safe, fair, and fun for all participants.</p>
+                            
+                            <p>Follow along with the game on Instagram: <a href="https://instagram.com/{{ config['INSTAGRAM_USERNAME'] }}" target="_blank">@{{ config['INSTAGRAM_USERNAME'] }}</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h2 class="h4 mb-0">Game Administrators</h2>
+                        </div>
+                        <div class="card-body">
+                            <p>If you have questions about the game or need assistance, please contact the game administrators:</p>
+                            
+                            <address>
+                                <strong>Game Coordinator:</strong><br>
+                                Senior Class President<br>
+                                Email: president@example.com
+                            </address>
+                            
+                            <address>
+                                <strong>Rules Committee:</strong><br>
+                                Senior Class Representatives<br>
+                                Email: rules@example.com
+                            </address>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h2 class="h4 mb-0">Frequently Asked Questions</h2>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    How do I submit a kill?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>After successfully eliminating a target, follow these steps:</p>
+                                    <ol>
+                                        <li>Login to your game account</li>
+                                        <li>Go to your game dashboard</li>
+                                        <li>Click on "Submit a Kill"</li>
+                                        <li>Fill out the form, including uploading your video evidence</li>
+                                        <li>Wait for confirmation from other players</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    What happens when one of my team members is eliminated?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>If your team has two members and one is eliminated, your team is still in the game. The remaining player continues to hunt their target. At the start of the next round, the eliminated player will be revived if your team is still alive.</p>
+                                    
+                                    <p>A team is only eliminated when all its members have been eliminated.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    What if I disagree with a kill confirmation?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>If you believe a kill was invalid (e.g., it occurred in a safe zone or using non-approved methods), you can vote to reject the kill confirmation when it comes up for voting.</p>
+                                    
+                                    <p>If there are significant disputes, you can contact the game administrators with your concerns.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFour">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    I forgot my password. What should I do?
+                                </button>
+                            </h2>
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>If you've forgotten your password, please contact the game administrators to help reset your account.</p>
+                                    
+                                    <p>Include your name, team name, and email address in your request for faster assistance.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h4 mb-0">Technical Support</h2>
+                </div>
+                <div class="card-body">
+                    <p>If you're experiencing technical issues with the game portal, please contact:</p>
+                    
+                    <address>
+                        <strong>Technical Support:</strong><br>
+                        Email: support@example.com
+                    </address>
+                    
+                    <p>Please include the following information in your support request:</p>
+                    <ul>
+                        <li>Your name and team name</li>
+                        <li>Device and browser you're using</li>
+                        <li>Detailed description of the issue</li>
+                        <li>Screenshots of any error messages (if applicable)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('main.index') }}" class="btn btn-primary">Back to Home</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('game.home') }}" class="btn btn-secondary">Back to Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

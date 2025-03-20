@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Kill Confirmations{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <h1 class="display-5 mb-4">Kill Confirmations</h1>
+            
+            {% if kill_confirmations %}
+                <div class="alert alert-info">
+                    <div class="d-flex">
+                        <div class="me-2">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>
+                            <p><strong>Voting Guidelines:</strong></p>
+                            <ul>
+                                <li>Watch the video carefully before voting</li>
+                                <li>Approve only valid eliminations that follow the rules</li>
+                                <li>Reject eliminations that occur in safe zones or violate game rules</li>
+                                <li>Be fair and honest in your voting</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3>Kill Confirmation Votes ({{ kill_confirmations|length }})</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for confirmation in kill_confirmations %}
+                            <div class="vote-card">
+                                <h4>Kill Submission #{{ loop.index }}</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p>
+                                            <strong>Attacker:</strong> {{ confirmation.attacker.name }} 
+                                            (Team {{ Team.query.get(confirmation.attacker.team_id).name }})
+                                        </p>
+                                        <p>
+                                            <strong>Victim:</strong> {{ confirmation.victim.name }}
+                                            (Team {{ Team.query.get(confirmation.victim.team_id).name }})
+                                        </p>
+                                        <p><strong>Time of Kill:</strong> {{ confirmation.kill_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                                        <p><strong>Round:</strong> {{ confirmation.round_number }}</p>
+                                        <p>
+                                            <strong>Vote Expiration:</strong>
+                                            <span class="text-danger">{{ confirmation.expiration_time.strftime('%Y-%m-%d %H:%M') }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="video-container">
+                                            <video controls>
+                                                <source src="{{ url_for('static', filename=confirmation.video_path) }}" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
+                                        <a href="{{ url_for('game.view_video', kill_confirmation_id=confirmation.id) }}" class="btn btn-sm btn-secondary mt-2">
+                                            <i class="fas fa-expand"></i> View Full Video
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="vote-buttons mt-4">
+                                    <a href="{{ url_for('game.vote', kill_confirmation_id=confirmation.id, vote_value='approve') }}" class="btn btn-success">
+                                        <i class="fas fa-check me-2"></i> Approve Kill
+                                    </a>
+                                    <a href="{{ url_for('game.vote', kill_confirmation_id=confirmation.id, vote_value='reject') }}" class="btn btn-danger">
+                                        <i class="fas fa-times me-2"></i> Reject Kill
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            {% if not loop.last %}
+                                <hr class="my-4">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                        <h3>No Pending Kill Confirmations</h3>
+                        <p class="lead">You have no kill confirmations to vote on at this time.</p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('game.home') }}" class="btn btn-primary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

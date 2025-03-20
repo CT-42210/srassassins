@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center mb-4">
+        <h1 class="display-4">Senior Assassin</h1>
+    </div>
+</div>
+
+{% if game_state.is_pre %}
+<!-- Pre-game state -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h2 class="card-title">Game Registration</h2>
+                <p class="card-text lead">Sign up to participate in this year's Senior Assassin game!</p>
+                
+                <div class="mt-4">
+                    <p>Follow our Instagram for updates: <a href="https://instagram.com/{{ instagram_username }}" target="_blank">@{{ instagram_username }}</a></p>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('auth.signup') }}" class="btn btn-primary btn-lg">Sign Up</a>
+                    <a href="{{ url_for('main.rules') }}" class="btn btn-outline-secondary btn-lg ms-2">Read Rules</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif game_state.is_live %}
+<!-- Live game state -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h2 class="card-title">Round {{ round_number }} in Progress</h2>
+                
+                {% if round_end %}
+                <p class="lead">Time Remaining:</p>
+                <div class="countdown-timer mb-3" data-end="{{ round_end.isoformat() }}">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <div class="card bg-dark text-white text-center" style="width: 5rem;">
+                                <div class="card-body p-2">
+                                    <h3 id="days">00</h3>
+                                    <small>DAYS</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="card bg-dark text-white text-center" style="width: 5rem;">
+                                <div class="card-body p-2">
+                                    <h3 id="hours">00</h3>
+                                    <small>HOURS</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="card bg-dark text-white text-center" style="width: 5rem;">
+                                <div class="card-body p-2">
+                                    <h3 id="minutes">00</h3>
+                                    <small>MINS</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="card bg-dark text-white text-center" style="width: 5rem;">
+                                <div class="card-body p-2">
+                                    <h3 id="seconds">00</h3>
+                                    <small>SECS</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="row my-4">
+                    <div class="col-md-6">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h4>Teams Remaining</h4>
+                                <h2>{{ alive_teams }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h4>Players Remaining</h4>
+                                <h2>{{ alive_players }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">Sign In</a>
+                    <a href="{{ url_for('main.leaderboard') }}" class="btn btn-outline-secondary btn-lg ms-2">View Leaderboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif game_state.is_post %}
+<!-- Post-game state -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h2 class="card-title">Game Complete!</h2>
+                
+                {% if no_winner %}
+                <p class="lead">No winner was declared for this game.</p>
+                {% else %}
+                <div class="winner-showcase p-3 my-4">
+                    <h3 class="text-success">🏆 WINNERS 🏆</h3>
+                    
+                    <div class="mt-3">
+                        <h4>Team {{ winning_team.name }}</h4>
+                        
+                        {% if winning_team.photo_path %}
+                        <div class="text-center my-3">
+                            <img src="{{ url_for('static', filename=winning_team.photo_path) }}" alt="Winning Team" class="img-fluid rounded" style="max-height: 300px;">
+                        </div>
+                        {% endif %}
+                        
+                        <div class="team-members my-3">
+                            <h5>Team Members:</h5>
+                            <ul class="list-unstyled">
+                                {% for player in winning_players %}
+                                <li>{{ player.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        <div class="stats my-3">
+                            <h5>Final Stats:</h5>
+                            <p>Eliminations: {{ winning_team.eliminations }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('main.leaderboard') }}" class="btn btn-primary btn-lg">View Final Leaderboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Forced end state -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h2 class="card-title">Game Has Been Ended by Admin</h2>
+                <p class="lead">The Senior Assassin game has been ended by the administrator before completion.</p>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('main.leaderboard') }}" class="btn btn-primary btn-lg">View Final Standings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Countdown timer functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const countdownElements = document.querySelectorAll('.countdown-timer');
+        
+        countdownElements.forEach(function(element) {
+            const endTime = new Date(element.dataset.end).getTime();
+            
+            // Update the countdown every second
+            const timer = setInterval(function() {
+                // Get current date and time
+                const now = new Date().getTime();
+                
+                // Find the time difference
+                const timeDiff = endTime - now;
+                
+                // Time calculations for days, hours, minutes, and seconds
+                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+                
+                // Display the results
+                element.querySelector('#days').textContent = String(days).padStart(2, '0');
+                element.querySelector('#hours').textContent = String(hours).padStart(2, '0');
+                element.querySelector('#minutes').textContent = String(minutes).padStart(2, '0');
+                element.querySelector('#seconds').textContent = String(seconds).padStart(2, '0');
+                
+                // If the countdown is over, display a message
+                if (timeDiff < 0) {
+                    clearInterval(timer);
+                    element.innerHTML = '<p class="lead text-danger">Round has ended. Please refresh for updates.</p>';
+                }
+            }, 1000);
+        });
+    });
+</script>
+{% endblock %}

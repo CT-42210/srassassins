@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Sign Up (Step 3){% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-4">Sign Up for Senior Assassin</h1>
+            
+            <!-- Signup Progress Indicator -->
+            <div class="signup-progress">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="signup-step completed">
+                            <div class="signup-step-number">1</div>
+                            <div class="signup-step-label">Rules</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step completed">
+                            <div class="signup-step-number">2</div>
+                            <div class="signup-step-label">Team Info</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step active">
+                            <div class="signup-step-number">3</div>
+                            <div class="signup-step-label">Player 1</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">4</div>
+                            <div class="signup-step-label">Player 2</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">5</div>
+                            <div class="signup-step-label">Team Photo</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Step 3: Player 1 Information</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('auth.signup') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="player_name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="player_name" name="player_name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="player_email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="player_email" name="player_email" required>
+                            <div class="form-text">This will be your login username.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="player_phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="player_phone" name="player_phone" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="player_address" class="form-label">Home Address</label>
+                            <textarea class="form-control" id="player_address" name="player_address" rows="3" required></textarea>
+                            <div class="form-text">This will only be visible to the team targeting you.</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="player_password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="player_password" name="player_password" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="player_password_confirm" class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" id="player_password_confirm" name="player_password_confirm" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div>
+                                    <strong>Note:</strong> Your personal information will only be visible to game administrators and the team assigned to target you.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('auth.signup_back') }}" class="btn btn-secondary">Back</a>
+                            <button type="submit" class="btn btn-primary">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="{{ url_for('auth.signup_reset') }}" class="text-muted">Start Over</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

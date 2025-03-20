@@ -1,0 +1,38 @@
+senior_assassin/
+│
+├── app/
+│   ├── __init__.py            # Flask app initialization
+│   ├── config.py              # Configuration settings
+│   ├── models.py              # Database models
+│   ├── routes/
+│   │   ├── __init__.py        # Routes initialization
+│   │   ├── main.py            # Main routes (home, leaderboard, etc.)
+│   │   ├── auth.py            # Authentication routes (login, signup)
+│   │   ├── game.py            # Game-related routes (kill submission, voting)
+│   │   └── admin.py           # Admin routes
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── email_service.py   # Email functionality
+│   │   ├── instagram_service.py # Instagram functionality
+│   │   ├── game_service.py    # Game logic and management
+│   │   └── admin_service.py   # Admin services
+│   ├── static/
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── img/
+│   └── templates/
+│       ├── base.html          # Base template
+│       ├── index.html         # Landing page
+│       ├── signup/            # Signup process templates
+│       ├── auth/              # Login templates
+│       ├── game/              # Game-related templates
+│       └── admin/             # Admin templates
+│
+├── migrations/                # Database migrations
+├── instance/                  # Instance-specific data
+├── logs/                      # Log files
+├── backups/                   # Database backups
+├── .env                       # Environment variables
+├── requirements.txt           # Project dependencies
+├── run.py                     # Application entry point
+└── README.md                  # Project documentation

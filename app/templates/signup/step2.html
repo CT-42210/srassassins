@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Sign Up (Step 2){% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-4">Sign Up for Senior Assassin</h1>
+            
+            <!-- Signup Progress Indicator -->
+            <div class="signup-progress">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="signup-step completed">
+                            <div class="signup-step-number">1</div>
+                            <div class="signup-step-label">Rules</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step active">
+                            <div class="signup-step-number">2</div>
+                            <div class="signup-step-label">Team Info</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">3</div>
+                            <div class="signup-step-label">Player 1</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">4</div>
+                            <div class="signup-step-label">Player 2</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">5</div>
+                            <div class="signup-step-label">Team Photo</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Step 2: Team Information</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('auth.signup') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label for="team_name" class="form-label">Team Name</label>
+                            <input type="text" class="form-control" id="team_name" name="team_name" required>
+                            <div class="form-text">Choose a creative team name that's appropriate for school.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="player_count" class="form-label">Number of Players</label>
+                            <select class="form-control" id="player_count" name="player_count" required>
+                                <option value="1">1 Player</option>
+                                <option value="2" selected>2 Players</option>
+                            </select>
+                            <div class="form-text">Teams can have either one or two players.</div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div>
+                                    <strong>Important:</strong> Once you submit your team information, you cannot change it later.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('auth.signup_back') }}" class="btn btn-secondary">Back</a>
+                            <button type="submit" class="btn btn-primary">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="{{ url_for('auth.signup_reset') }}" class="text-muted">Start Over</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

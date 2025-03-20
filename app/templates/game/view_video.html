@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - View Kill Video{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Kill Confirmation Video</h3>
+                        <a href="{{ url_for('game.voting') }}" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Voting
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Elimination Details</h5>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Attacker</th>
+                                        <td>{{ attacker.name }} (Team {{ attacker_team.name }})</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Victim</th>
+                                        <td>{{ victim.name }} (Team {{ victim_team.name }})</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Time</th>
+                                        <td>{{ kill_confirmation.kill_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Round</th>
+                                        <td>{{ kill_confirmation.round_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Expiration</th>
+                                        <td>{{ kill_confirmation.expiration_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Voting Status</h5>
+                            <div class="progress mb-3" style="height: 30px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ (kill_confirmation.approve_votes / (kill_confirmation.approve_votes + kill_confirmation.reject_votes) * 100) if (kill_confirmation.approve_votes + kill_confirmation.reject_votes) > 0 else 0 }}%">
+                                    Approve: {{ kill_confirmation.approve_votes }}
+                                </div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ (kill_confirmation.reject_votes / (kill_confirmation.approve_votes + kill_confirmation.reject_votes) * 100) if (kill_confirmation.approve_votes + kill_confirmation.reject_votes) > 0 else 0 }}%">
+                                    Reject: {{ kill_confirmation.reject_votes }}
+                                </div>
+                            </div>
+                            <p>
+                                <strong>Voting Threshold:</strong> {{ game_state.voting_threshold }} votes required
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="video-container-fullsize mb-4">
+                        <video controls class="w-100">
+                            <source src="{{ url_for('static', filename=confirmation.video_path) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div>
+                                <p><strong>Elimination Validity Criteria:</strong></p>
+                                <ul>
+                                    <li>The victim is clearly hit with water</li>
+                                    <li>The attacker verbally confirms the elimination</li>
+                                    <li>The elimination does not take place in a safe zone</li>
+                                    <li>Only approved water-based methods were used</li>
+                                </ul>
+                                <p>If any of these criteria are not met, the elimination should be rejected.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="vote-buttons d-flex justify-content-center gap-3 mt-4">
+                        <a href="{{ url_for('game.vote', kill_confirmation_id=kill_confirmation.id, vote_value='approve') }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-check me-2"></i> Approve Kill
+                        </a>
+                        <a href="{{ url_for('game.vote', kill_confirmation_id=kill_confirmation.id, vote_value='reject') }}" class="btn btn-danger btn-lg">
+                            <i class="fas fa-times me-2"></i> Reject Kill
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .video-container-fullsize {
+        max-height: 70vh;
+    }
+    
+    .video-container-fullsize video {
+        max-height: 70vh;
+    }
+</style>
+{% endblock %}

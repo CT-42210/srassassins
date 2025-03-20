@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Sign Up (Step 1){% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-4">Sign Up for Senior Assassin</h1>
+            
+            <!-- Signup Progress Indicator -->
+            <div class="signup-progress">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="signup-step active">
+                            <div class="signup-step-number">1</div>
+                            <div class="signup-step-label">Rules</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">2</div>
+                            <div class="signup-step-label">Team Info</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">3</div>
+                            <div class="signup-step-label">Player 1</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">4</div>
+                            <div class="signup-step-label">Player 2</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step">
+                            <div class="signup-step-number">5</div>
+                            <div class="signup-step-label">Team Photo</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Step 1: Game Rules</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Important:</strong> Please read and acknowledge the game rules before proceeding.
+                    </div>
+                    
+                    <div class="rules-container p-3 mb-4" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 5px;">
+                        <h4>Game Overview</h4>
+                        <p>Senior Assassin is a game of stealth, strategy, and survival. Each team is assigned another team as their target. The goal is to "eliminate" all members of your target team using water-based weapons. The last team standing wins.</p>
+                        
+                        <h4>Teams</h4>
+                        <ul>
+                            <li>Teams can consist of either one or two players.</li>
+                            <li>All team members must be seniors at our high school.</li>
+                            <li>Once teams are formed, they cannot be changed.</li>
+                            <li>Each team must have a team name and photo for identification.</li>
+                        </ul>
+                        
+                        <h4>Game Rounds</h4>
+                        <ul>
+                            <li>The game is divided into multiple rounds.</li>
+                            <li>At the beginning of each round, teams are assigned a new target.</li>
+                            <li>Rounds have a specific start and end time, which will be announced.</li>
+                            <li>If a team is eliminated but their team has at least one surviving player, they will be revived at the start of the next round.</li>
+                        </ul>
+                        
+                        <h4>Elimination Rules</h4>
+                        <ol>
+                            <li><strong>Permitted weapons:</strong> Water guns, water balloons, and other water-based tools.</li>
+                            <li><strong>To eliminate a player:</strong> You must hit them with water and say "You've been eliminated" or similar phrase.</li>
+                            <li><strong>Video proof:</strong> All eliminations must be recorded on video as proof.</li>
+                            <li><strong>Safe zones:</strong>
+                                <ul>
+                                    <li>School property during school hours</li>
+                                    <li>Places of employment during work hours</li>
+                                    <li>Inside vehicles</li>
+                                    <li>Bathrooms</li>
+                                    <li>Religious services</li>
+                                    <li>School-sponsored events</li>
+                                </ul>
+                            </li>
+                            <li><strong>Team elimination:</strong> A team is eliminated when all its members have been eliminated.</li>
+                        </ol>
+                        
+                        <h4>Safety Guidelines</h4>
+                        <ol>
+                            <li>Never trespass on private property.</li>
+                            <li>Never engage in dangerous behavior (e.g., chasing in traffic, climbing buildings).</li>
+                            <li>Water weapons should not be visible in public places where they might cause alarm.</li>
+                            <li>No eliminations while driving or that would distract a driver.</li>
+                            <li>Be respectful of bystanders and public spaces.</li>
+                        </ol>
+                        
+                        <h4>Sportsmanship</h4>
+                        <ol>
+                            <li>Be honest about eliminations.</li>
+                            <li>Accept eliminations gracefully.</li>
+                            <li>Vote fairly on kill confirmations.</li>
+                            <li>No harassment or intimidation of other players.</li>
+                            <li>No destruction of property or disruptive behavior.</li>
+                        </ol>
+                    </div>
+                    
+                    <form method="post" action="{{ url_for('auth.signup') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="rules_acknowledged" id="rules_acknowledged" required>
+                            <label class="form-check-label" for="rules_acknowledged">
+                                I have read and agree to follow the game rules. I understand that violations may result in disqualification.
+                            </label>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

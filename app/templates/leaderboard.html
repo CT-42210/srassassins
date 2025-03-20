@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Leaderboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="display-4 mb-4">Leaderboard</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Team</th>
+                                    <th scope="col">Players</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Eliminations</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for team in leaderboard %}
+                                <tr class="team-row team-{{ team.state }}">
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ team.team_name }}</td>
+                                    <td>
+                                        {% for player in team.players %}
+                                        <div>
+                                            {{ player.player_name }}
+                                            <span class="badge {% if player.state == 'alive' %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ player.state }}
+                                            </span>
+                                        </div>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if team.state == 'alive' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ team.state }}
+                                        </span>
+                                    </td>
+                                    <td>{{ team.eliminations }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('main.index') }}" class="btn btn-primary">Back to Home</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('game.home') }}" class="btn btn-secondary">Back to Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

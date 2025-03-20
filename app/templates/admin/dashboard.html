@@ -1,0 +1,759 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Admin Dashboard{% endblock %}
+
+{% block styles %}
+<style>
+    /* Admin dashboard specific styles */
+    .admin-nav {
+        background-color: #343a40;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .admin-nav .nav-link {
+        color: rgba(255, 255, 255, 0.75);
+        padding: 8px 15px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .admin-nav .nav-link:hover,
+    .admin-nav .nav-link.active {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .admin-card {
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .admin-card .card-header {
+        background-color: #343a40;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .confirmation-checkbox {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #f8d7da;
+        border-radius: 5px;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .status-card {
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        color: white;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3 col-lg-2">
+            <div class="admin-nav">
+                <h4 class="text-white mb-4">Admin Console</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link admin-tab-link" href="#dashboard-overview">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link admin-tab-link" href="#team-management">Team Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link admin-tab-link" href="#game-control">Game Control</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link admin-tab-link" href="#vote-management">Vote Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link admin-tab-link" href="#database-management">Database Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link admin-tab-link" href="#activity-logs">Activity Logs</a>
+                    </li>
+                </ul>
+                <hr class="my-3 bg-light">
+                <div class="text-center">
+                    <a href="{{ url_for('admin.logout') }}" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <h1 class="mb-4">Admin Dashboard</h1>
+            
+            <!-- Dashboard Overview -->
+            <div id="dashboard-overview" class="admin-tab-content">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="status-card bg-primary">
+                            <h5>Game State</h5>
+                            <h3>{{ dashboard.game_state.state|upper }}</h3>
+                            <p>Round: {{ dashboard.game_state.round_number }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="status-card bg-success">
+                            <h5>Teams</h5>
+                            <h3>{{ dashboard.team_stats.alive }} / {{ dashboard.team_stats.total }}</h3>
+                            <p>{{ dashboard.team_stats.pending }} pending</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="status-card bg-info">
+                            <h5>Players</h5>
+                            <h3>{{ dashboard.player_stats.alive }} / {{ dashboard.player_stats.total }}</h3>
+                            <p>{{ dashboard.player_stats.dead }} eliminated</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="status-card bg-warning text-dark">
+                            <h5>Kill Confirmations</h5>
+                            <h3>{{ dashboard.kill_stats.total }}</h3>
+                            <p>{{ dashboard.kill_stats.pending }} pending</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card admin-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Round Schedule</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if dashboard.game_state.round_start and dashboard.game_state.round_end %}
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6>Round Start:</h6>
+                                        <p>{{ dashboard.game_state.round_start.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Round End:</h6>
+                                        <p>{{ dashboard.game_state.round_end.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p>No round schedule has been set.</p>
+                                {% endif %}
+                                
+                                <div class="text-center">
+                                    <a href="#game-control" class="btn btn-primary admin-tab-link">Manage Schedule</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card admin-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Database Status</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if dashboard.database.size_mb %}
+                                <p>
+                                    <strong>Database Size:</strong> {{ "%.2f"|format(dashboard.database.size_mb) }} MB
+                                </p>
+                                {% endif %}
+                                
+                                <div class="text-center">
+                                    <a href="{{ url_for('admin.backup_db') }}" class="btn btn-primary">Backup Database</a>
+                                    <a href="#database-management" class="btn btn-secondary admin-tab-link">Database Tools</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Team Management -->
+            <div id="team-management" class="admin-tab-content d-none">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Pending Teams</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if pending_teams %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Team Name</th>
+                                        <th>Players</th>
+                                        <th>Created</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for team in pending_teams %}
+                                    <tr>
+                                        <td>{{ team.name }}</td>
+                                        <td>
+                                            {% for player in team.players %}
+                                            <div>{{ player.name }} ({{ player.email }})</div>
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ team.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('admin.approve_team', team_id=team.id) }}" class="btn btn-sm btn-success">Accept</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p>No pending team requests.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card admin-card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Toggle Team/Player Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Teams</h6>
+                                <div class="list-group">
+                                    {% for team in all_teams %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ team.name }}</strong>
+                                            <span class="badge {% if team.is_alive %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ team.state }}
+                                            </span>
+                                        </div>
+                                        <a href="{{ url_for('admin.toggle_team', team_id=team.id) }}" class="btn btn-sm btn-warning">
+                                            Toggle
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h6>Players</h6>
+                                <div class="list-group">
+                                    {% for player in all_players %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ player.name }}</strong>
+                                            <small>({{ player.team.name }})</small>
+                                            <span class="badge {% if player.is_alive %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ player.state }}
+                                            </span>
+                                        </div>
+                                        <a href="{{ url_for('admin.toggle_player', player_id=player.id) }}" class="btn btn-sm btn-warning">
+                                            Toggle
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game Control -->
+            <div id="game-control" class="admin-tab-content d-none">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card admin-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Change Game State</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ url_for('admin.update_game_state') }}" method="post" class="admin-action-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    
+                                    <div class="mb-3">
+                                        <label for="game_state" class="form-label">Game State</label>
+                                        <select class="form-control" id="game_state" name="game_state" required>
+                                            <option value="pre" {% if dashboard.game_state.state == 'pre' %}selected{% endif %}>Pre-Game</option>
+                                            <option value="live" {% if dashboard.game_state.state == 'live' %}selected{% endif %}>Live Game</option>
+                                            <option value="post" {% if dashboard.game_state.state == 'post' %}selected{% endif %}>Post-Game</option>
+                                            <option value="forced" {% if dashboard.game_state.state == 'forced' %}selected{% endif %}>Forced End</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="confirmation-checkbox">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="state_confirmation" name="confirmation" value="yes">
+                                            <label class="form-check-label" for="state_confirmation">
+                                                I understand this action will change the game state and may affect all players.
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center mt-3">
+                                        <button type="submit" class="btn btn-danger">Change Game State</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card admin-card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Manual Round Control</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="{{ url_for('admin.new_round') }}" method="post" class="admin-action-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    
+                                    <p>
+                                        <strong>Current Round:</strong> {{ dashboard.game_state.round_number }}
+                                    </p>
+                                    
+                                    <div class="alert alert-info">
+                                        Starting a new round will:
+                                        <ul>
+                                            <li>Increment the round number</li>
+                                            <li>Assign new targets to all teams</li>
+                                            <li>Revive eliminated players in surviving teams</li>
+                                            <li>Send notifications to all players</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="confirmation-checkbox">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="round_confirmation" name="confirmation" value="yes">
+                                            <label class="form-check-label" for="round_confirmation">
+                                                I understand this action will start a new round.
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center mt-3">
+                                        <button type="submit" class="btn btn-primary">Start New Round</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card admin-card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Automated Round Schedule</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('admin.schedule_round') }}" method="post" class="admin-action-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="round_start" class="form-label">Round Start Time</label>
+                                        <input type="datetime-local" class="form-control" id="round_start" name="round_start" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="round_end" class="form-label">Round End Time</label>
+                                        <input type="datetime-local" class="form-control" id="round_end" name="round_end" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                Setting a schedule will:
+                                <ul>
+                                    <li>Automatically start the round at the specified start time</li>
+                                    <li>Automatically end the current round and start a new one at the end time</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="confirmation-checkbox">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="schedule_confirmation" name="confirmation" value="yes">
+                                    <label class="form-check-label" for="schedule_confirmation">
+                                        I understand this action will set an automated schedule for rounds.
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <button type="submit" class="btn btn-primary">Set Round Schedule</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vote Management -->
+            <div id="vote-management" class="admin-tab-content d-none">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Pending Kill Confirmations</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if pending_confirmations %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Attacker</th>
+                                        <th>Victim</th>
+                                        <th>Time</th>
+                                        <th>Round</th>
+                                        <th>Votes</th>
+                                        <th>Expires</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for confirmation in pending_confirmations %}
+                                    <tr>
+                                        <td>{{ confirmation.attacker.name }}</td>
+                                        <td>{{ confirmation.victim.name }}</td>
+                                        <td>{{ confirmation.kill_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>{{ confirmation.round_number }}</td>
+                                        <td>
+                                            <span class="text-success">{{ confirmation.approve_votes }}</span> /
+                                            <span class="text-danger">{{ confirmation.reject_votes }}</span>
+                                        </td>
+                                        <td>{{ confirmation.expiration_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td class="action-buttons">
+                                            <a href="{{ url_for('admin.force_vote', kill_confirmation_id=confirmation.id, decision='approve') }}" class="btn btn-sm btn-success">Approve</a>
+                                            <a href="{{ url_for('admin.force_vote', kill_confirmation_id=confirmation.id, decision='reject') }}" class="btn btn-sm btn-danger">Reject</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p>No pending kill confirmations.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- View and analyze past confirmations -->
+                <div class="card admin-card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Kill History</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>View and analyze past kill confirmations:</p>
+                        <form action="{{ url_for('admin.execute_sql') }}" method="post" class="admin-action-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="confirmation" value="yes">
+                            <input type="hidden" name="sql_command" value="SELECT kc.id, p1.name as victim, p2.name as attacker, t1.name as victim_team, t2.name as attacker_team, kc.kill_time, kc.round_number, kc.status FROM kill_confirmations kc JOIN players p1 ON kc.victim_id = p1.id JOIN players p2 ON kc.attacker_id = p2.id JOIN teams t1 ON p1.team_id = t1.id JOIN teams t2 ON p2.team_id = t2.id ORDER BY kc.kill_time DESC LIMIT 50;">
+                            
+                            <div class="text-center mt-3">
+                                <button type="submit" class="btn btn-primary">View Kill History</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Database Management -->
+            <div id="database-management" class="admin-tab-content d-none">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Execute SQL Command</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <strong>Warning:</strong> This feature allows direct execution of SQL commands on the database. Use with extreme caution.
+                        </div>
+                        
+                        <form action="{{ url_for('admin.execute_sql') }}" method="post" class="admin-action-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                            <div class="mb-3">
+                                <label for="sql_command" class="form-label">SQL Command</label>
+                                <textarea class="form-control" id="sql_command" name="sql_command" rows="5" required></textarea>
+                            </div>
+                            
+                            <div class="confirmation-checkbox">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sql_confirmation" name="confirmation" value="yes">
+                                    <label class="form-check-label" for="sql_confirmation">
+                                        I understand this action will directly modify the database and may cause irreversible changes.
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <button type="submit" class="btn btn-danger">Execute SQL</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card admin-card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Database Maintenance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Manual Backup</h5>
+                                        <p class="card-text">Create a full backup of the database.</p>
+                                        <a href="{{ url_for('admin.backup_db') }}" class="btn btn-primary">Backup Database</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Daily Backups</h5>
+                                        <p class="card-text">Automatic backups run daily at 3:00 AM.</p>
+                                        <p>Stored in: <code>backups/</code></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Quick Database Queries</h5>
+                                <div class="list-group">
+                                    <a href="#" class="list-group-item list-group-item-action" 
+                                       onclick="document.getElementById('sql_command').value='SELECT * FROM teams ORDER BY name;'; return false;">
+                                        View all teams
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action" 
+                                       onclick="document.getElementById('sql_command').value='SELECT * FROM players ORDER BY name;'; return false;">
+                                        View all players
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action" 
+                                       onclick="document.getElementById('sql_command').value='SELECT * FROM game_state;'; return false;">
+                                        View game state
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action" 
+                                       onclick="document.getElementById('sql_command').value='SELECT * FROM kill_confirmations ORDER BY created_at DESC LIMIT 20;'; return false;">
+                                        View recent kill confirmations
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action" 
+                                       onclick="document.getElementById('sql_command').value='SELECT * FROM action_logs ORDER BY timestamp DESC LIMIT 50;'; return false;">
+                                        View recent action logs
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Logs -->
+            <div id="activity-logs" class="admin-tab-content d-none">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Recent Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Action</th>
+                                        <th>Actor</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in dashboard.recent_logs %}
+                                    <tr>
+                                        <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                        <td>{{ log.action_type }}</td>
+                                        <td>{{ log.actor }}</td>
+                                        <td>{{ log.description }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <form action="{{ url_for('admin.execute_sql') }}" method="post" class="admin-action-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="confirmation" value="yes">
+                                <input type="hidden" name="sql_command" value="SELECT * FROM action_logs ORDER BY timestamp DESC LIMIT 100;">
+                                
+                                <button type="submit" class="btn btn-primary">View More Logs</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card admin-card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Activity Filters</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <form action="{{ url_for('admin.execute_sql') }}" method="post" class="admin-action-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="confirmation" value="yes">
+                                    
+                                    <div class="mb-3">
+                                        <label for="action_type" class="form-label">Filter by Action Type</label>
+                                        <select class="form-control" id="action_type" onchange="updateActionFilter()">
+                                            <option value="">All Actions</option>
+                                            <option value="player_login">Player Logins</option>
+                                            <option value="kill_submission">Kill Submissions</option>
+                                            <option value="kill_vote">Kill Votes</option>
+                                            <option value="kill_confirmed">Kill Confirmations</option>
+                                            <option value="team_registration">Team Registrations</option>
+                                            <option value="admin">Admin Actions</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <input type="hidden" id="action_sql" name="sql_command" value="SELECT * FROM action_logs ORDER BY timestamp DESC LIMIT 100;">
+                                    
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">Filter Logs</button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <form action="{{ url_for('admin.execute_sql') }}" method="post" class="admin-action-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="confirmation" value="yes">
+                                    
+                                    <div class="mb-3">
+                                        <label for="actor_name" class="form-label">Filter by Actor Name</label>
+                                        <input type="text" class="form-control" id="actor_name" placeholder="Enter actor name">
+                                    </div>
+                                    
+                                    <input type="hidden" id="actor_sql" name="sql_command" value="">
+                                    
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary" onclick="updateActorFilter()">Search Actor</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            function updateActionFilter() {
+                                const actionType = document.getElementById('action_type').value;
+                                let sql = "SELECT * FROM action_logs";
+                                
+                                if (actionType) {
+                                    if (actionType === 'admin') {
+                                        sql += " WHERE action_type LIKE '%admin%' OR actor = 'admin'";
+                                    } else {
+                                        sql += " WHERE action_type = '" + actionType + "'";
+                                    }
+                                }
+                                
+                                sql += " ORDER BY timestamp DESC LIMIT 100;";
+                                document.getElementById('action_sql').value = sql;
+                            }
+                            
+                            function updateActorFilter() {
+                                const actorName = document.getElementById('actor_name').value;
+                                let sql = "SELECT * FROM action_logs";
+                                
+                                if (actorName) {
+                                    sql += " WHERE actor LIKE '%" + actorName + "%'";
+                                }
+                                
+                                sql += " ORDER BY timestamp DESC LIMIT 100;";
+                                document.getElementById('actor_sql').value = sql;
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize the tab navigation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all tab links
+        const tabLinks = document.querySelectorAll('.admin-tab-link');
+        
+        // Add click event to each tab link
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the target section ID from the href attribute
+                const targetId = this.getAttribute('href').substring(1);
+                
+                // Hide all tab content
+                document.querySelectorAll('.admin-tab-content').forEach(content => {
+                    content.classList.add('d-none');
+                });
+                
+                // Show the target content
+                document.getElementById(targetId).classList.remove('d-none');
+                
+                // Update active state on tabs
+                tabLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Activate the first tab by default
+        if (tabLinks.length > 0) {
+            tabLinks[0].click();
+        }
+    });
+    
+    // Pre-populate the datetime fields if they exist
+    document.addEventListener('DOMContentLoaded', function() {
+        const roundStartInput = document.getElementById('round_start');
+        const roundEndInput = document.getElementById('round_end');
+        
+        if (roundStartInput && roundEndInput) {
+            // Set default values to today plus one day/week
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const nextWeek = new Date(now);
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            
+            // Format dates for datetime-local input (YYYY-MM-DDThh:mm)
+            function formatDatetimeLocal(date) {
+                return date.getFullYear() + '-' + 
+                       String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(date.getDate()).padStart(2, '0') + 'T' + 
+                       String(date.getHours()).padStart(2, '0') + ':' + 
+                       String(date.getMinutes()).padStart(2, '0');
+            }
+            
+            roundStartInput.value = formatDatetimeLocal(tomorrow);
+            roundEndInput.value = formatDatetimeLocal(nextWeek);
+        }
+    });
+</script>
+{% endblock %}

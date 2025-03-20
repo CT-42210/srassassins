@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Submit Kill{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Submit a Kill</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div>
+                                <strong>Instructions:</strong> To submit a kill, you must provide video evidence of the elimination. The video must clearly show the target being hit with water and your verbal confirmation of elimination.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post" action="{{ url_for('game.submit_kill') }}" enctype="multipart/form-data" class="kill-submission-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Target Team</label>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>{{ target_team.name }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="victim_id" class="form-label">Select Eliminated Player</label>
+                            <select class="form-control" id="victim_id" name="victim_id" required>
+                                {% for player in target_players %}
+                                    <option value="{{ player.id }}">{{ player.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="kill_time" class="form-label">Date and Time of Kill</label>
+                            <input type="datetime-local" class="form-control" id="kill_time" name="kill_time" required>
+                            <div class="form-text">
+                                Please enter the exact date and time when the elimination occurred.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="kill_video" class="form-label">Upload Video Evidence</label>
+                            <input type="file" class="form-control" id="kill_video" name="kill_video" accept="video/mp4,video/mov" required>
+                            <div class="form-text">
+                                Supported formats: MP4, MOV. Maximum file size: 16MB.
+                            </div>
+                        </div>
+                        
+                        <div id="kill_video-preview" class="text-center my-4"></div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rules_confirmed" name="rules_confirmed" required>
+                                <label class="form-check-label" for="rules_confirmed">
+                                    I confirm that this elimination followed all game rules:
+                                    <ul class="mt-2">
+                                        <li>The elimination was not in a safe zone</li>
+                                        <li>I used only approved water-based methods</li>
+                                        <li>The target was clearly hit with water</li>
+                                        <li>I verbally confirmed the elimination</li>
+                                    </ul>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <strong>Important:</strong> False kill submissions or eliminations that violate the rules may result in penalties or disqualification.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('game.home') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-danger">Submit Kill</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

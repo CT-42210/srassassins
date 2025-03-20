@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Senior Assassin - Sign Up (Step 5){% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mb-4">Sign Up for Senior Assassin</h1>
+            
+            <!-- Signup Progress Indicator -->
+            <div class="signup-progress">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="signup-step completed">
+                            <div class="signup-step-number">1</div>
+                            <div class="signup-step-label">Rules</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step completed">
+                            <div class="signup-step-number">2</div>
+                            <div class="signup-step-label">Team Info</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step completed">
+                            <div class="signup-step-number">3</div>
+                            <div class="signup-step-label">Player 1</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step completed">
+                            <div class="signup-step-number">4</div>
+                            <div class="signup-step-label">Player 2</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="signup-step active">
+                            <div class="signup-step-number">5</div>
+                            <div class="signup-step-label">Team Photo</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Step 5: Team Photo</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('auth.signup') }}" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-4">
+                            <label for="team_photo" class="form-label">Upload Team Photo</label>
+                            <input type="file" class="form-control" id="team_photo" name="team_photo" accept="image/*" required>
+                            <div class="form-text">
+                                Supported formats: JPG, PNG, GIF. Maximum file size: 5MB.
+                            </div>
+                        </div>
+                        
+                        <div id="team_photo-preview" class="text-center my-4"></div>
+                        
+                        <div class="alert alert-info">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div>
+                                    <p><strong>Team Photo Requirements:</strong></p>
+                                    <ul>
+                                        <li>All team members must be visible and recognizable</li>
+                                        <li>Photo must be appropriate for school</li>
+                                        <li>This photo will be used for identification and may be posted on Instagram if your team is eliminated</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <strong>Final Step!</strong> Once you complete this step, your team registration will be submitted for approval.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('auth.signup_back') }}" class="btn btn-secondary">Back</a>
+                            <button type="submit" class="btn btn-success">Complete Registration</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="{{ url_for('auth.signup_reset') }}" class="text-muted">Start Over</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
