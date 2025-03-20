@@ -12,3 +12,4 @@ identifier.sqlite
 instance/
 
 migrations/
+!/app/static/uploads/

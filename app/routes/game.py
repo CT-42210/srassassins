@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from app.models import db, Team, Player, KillConfirmation, GameState
+from app.services.game_service import submit_kill as service_submit_kill
 
 game = Blueprint('game', __name__)
 
@@ -131,14 +132,16 @@ def submit_kill_route():
         filename = secure_filename(file.filename)
         file_ext = filename.rsplit('.', 1)[1].lower()
         unique_filename = f"/kill_{uuid.uuid4().hex}.{file_ext}"
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_filename)
+        print(current_app.config['UPLOAD_FOLDER'] + unique_filename)
+        file_path = current_app.config['UPLOAD_FOLDER'] + unique_filename
+        print(file_path)
         file.save(file_path)
 
         # The relative path that will be stored in the database
         relative_path = f"uploads/{unique_filename}"
 
         # Then update the submit_kill call:
-        kill_confirmation = submit_kill_route(
+        kill_confirmation = service_submit_kill(
             victim_id=victim_id,
             attacker_id=current_user.id,
             kill_time=kill_time,
@@ -150,7 +153,7 @@ def submit_kill_route():
             return redirect(url_for('game.home'))
         else:
             flash('Failed to submit kill. Please check your inputs and try again.', 'danger')
-            return redirect(url_for('game.submit_kill'))
+            return redirect(url_for('game.submit_kill_route'))
     
     return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players, now=datetime.now())
 

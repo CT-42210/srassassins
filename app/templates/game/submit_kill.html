@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     
-                    <form method="post" action="{{ url_for('game.submit_kill') }}" enctype="multipart/form-data" class="kill-submission-form">
+                    <form method="post" action="{{ url_for('game.submit_kill_route') }}" enctype="multipart/form-data" class="kill-submission-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         
                         <div class="mb-4">

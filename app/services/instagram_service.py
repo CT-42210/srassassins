@@ -2,6 +2,9 @@ import os
 import time
 from flask import current_app
 from instagrapi import Client
+
+from app.models import GameState  # Add this line
+
 from instagrapi.exceptions import LoginRequired
 
 # Global Instagram client instance
