@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Approved!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #28a745;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .rules-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Team Approved!</h1>
+        <h2>{{ team.name }} is now active in Senior Assassin</h2>
+    </div>
+
+    <div class="content">
+        <p>Congratulations! Your team <strong>{{ team.name }}</strong> has been approved and is now active in the Senior Assassin game.</p>
+
+        <p>Log in to the game portal to see your first target assignment and begin your hunt!</p>
+
+        <div class="rules-box">
+            <h3 style="margin-top: 0;">Key Rules Reminder:</h3>
+            <ul>
+                <li><strong>Approved weapons:</strong> Water guns, water balloons, and other water-based weapons only</li>
+                <li><strong>Safe zones:</strong> Classrooms during school hours, workplaces, and religious activities</li>
+                <li><strong>Evidence:</strong> All eliminations must be recorded on video</li>
+                <li><strong>Time limit:</strong> You have 48 hours to eliminate your target</li>
+                <li><strong>Confirmation:</strong> All eliminations require community voting to confirm</li>
+            </ul>
+        </div>
+
+        <p>Remember to check your email regularly for game updates, new rounds, and voting requests.</p>
+
+        <h4>Your Team:</h4>
+        <ul>
+            {% for player in team.players %}
+            <li><strong>{{ player.name }}</strong> - {{ player.email }}</li>
+            {% endfor %}
+        </ul>
+
+        <div style="text-align: center;">
+            <a href="{{ url_for('auth.login', _external=True) }}" class="button">Log in to Game Portal</a>
+        </div>
+
+        <p style="margin-top: 20px;">Good luck, and may the odds be ever in your favor!</p>
+    </div>
+
+    <div class="footer">
+        <p>This is an automated message from the Senior Assassin game system. Please do not reply to this email.</p>
+    </div>
+</body>
+</html>

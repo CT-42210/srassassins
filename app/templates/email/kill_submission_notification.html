@@ -55,12 +55,12 @@
         <h1>New Kill Submission</h1>
         <h3>Your Vote is Required</h3>
     </div>
-    
+
     <div class="content">
         <p>Greetings Assassin,</p>
-        
+
         <p>A new kill has been submitted and requires your vote to confirm or reject.</p>
-        
+
         <div class="info-box">
             <h3 style="margin-top: 0;">Kill Details:</h3>
             <p><strong>Attacker:</strong> {{ attacker.name }} (Team {{ attacker_team.name }})</p>
@@ -68,9 +68,9 @@
             <p><strong>Time of Kill:</strong> {{ kill_confirmation.kill_time.strftime('%Y-%m-%d %H:%M') }}</p>
             <p><strong>Round:</strong> {{ kill_confirmation.round_number }}</p>
         </div>
-        
+
         <p>Please log in to the game portal to review the kill submission video and cast your vote. Your vote must be submitted within 24 hours.</p>
-        
+
         <p>Remember to assess the kill based on the game rules:</p>
         <ul>
             <li>The kill must not occur in a safe zone</li>
@@ -78,12 +78,12 @@
             <li>The elimination must be clearly captured on video</li>
             <li>The attacker must verbally confirm the elimination</li>
         </ul>
-        
+
         <div style="text-align: center;">
             <a href="{{ url_for('game.voting', _external=True) }}" class="button">Review and Vote</a>
         </div>
     </div>
-    
+
     <div class="footer">
         <p>This is an automated message from the Senior Assassin game system. Please do not reply to this email.</p>
     </div>

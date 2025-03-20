@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Elimination Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #6c757d;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .stats-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .next-steps {
+            background-color: #e2f3f5;
+            border: 1px solid #b6e0e5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Team Elimination</h1>
+        <h2>{{ team.name }} has been eliminated</h2>
+    </div>
+
+    <div class="content">
+        <p>Team <strong>{{ team.name }}</strong>, we regret to inform you that your team has been eliminated from Senior Assassin.</p>
+
+        <div class="stats-box">
+            <h3 style="margin-top: 0;">Your Team Performance:</h3>
+            <p><strong>Rounds Survived:</strong> {{ team.eliminated_in_round }}</p>
+            <p><strong>Eliminations Made:</strong> {{ team.kill_count }}</p>
+            <p><strong>Final Ranking:</strong> {{ team.ranking }} out of {{ total_teams }}</p>
+        </div>
+
+        <p>Congratulations on your performance in the game! Although your hunting days are over, you still play a crucial role in Senior Assassin.</p>
+
+        <div class="next-steps">
+            <h3 style="margin-top: 0;">Next Steps:</h3>
+            <ul>
+                <li><strong>Vote on Kill Confirmations:</strong> Your vote matters in verifying eliminations</li>
+                <li><strong>Watch the Game Unfold:</strong> Log in to track the remaining teams</li>
+                <li><strong>Attend the End-of-Game Celebration:</strong> Details will be announced soon</li>
+            </ul>
+        </div>
+
+        <p>Thank you for participating in Senior Assassin! We hope you enjoyed the experience and the friendships formed along the way.</p>
+
+        <div style="text-align: center;">
+            <a href="{{ url_for('game.voting', _external=True) }}" class="button">Go to Voting Portal</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This is an automated message from the Senior Assassin game system. Please do not reply to this email.</p>
+    </div>
+</body>
+</html>

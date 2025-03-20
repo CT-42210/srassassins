@@ -48,14 +48,14 @@
         <h1>Senior Assassin</h1>
         <h2>Round {{ round_number }} Has Started!</h2>
     </div>
-    
+
     <div class="content">
         <p>Greetings Assassins,</p>
-        
+
         <p>Round {{ round_number }} of Senior Assassin has officially begun!</p>
-        
+
         <p>A new target has been assigned to your team. Log in to the game portal to see your new assignment and begin your hunt.</p>
-        
+
         <p>Remember:</p>
         <ul>
             <li>Be aware of safe zones</li>
@@ -63,14 +63,14 @@
             <li>Record video evidence of all eliminations</li>
             <li>Stay safe and have fun!</li>
         </ul>
-        
+
         <p>Good luck, and may the odds be ever in your favor!</p>
-        
+
         <div style="text-align: center;">
             <a href="{{ url_for('auth.login', _external=True) }}" class="button">Log in to Game Portal</a>
         </div>
     </div>
-    
+
     <div class="footer">
         <p>This is an automated message from the Senior Assassin game system. Please do not reply to this email.</p>
     </div>

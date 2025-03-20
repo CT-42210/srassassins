@@ -54,12 +54,12 @@
     <div class="header">
         <h1>Kill Submission {{ result|capitalize }}</h1>
     </div>
-    
+
     <div class="content">
         <p>Greetings Assassins,</p>
-        
+
         <p>The community has voted, and the kill submission has been <strong>{{ result }}</strong>.</p>
-        
+
         <div class="info-box">
             <h3 style="margin-top: 0;">Kill Details:</h3>
             <p><strong>Attacker:</strong> {{ attacker.name }} (Team {{ attacker_team.name }})</p>
@@ -67,7 +67,7 @@
             <p><strong>Time of Kill:</strong> {{ kill_confirmation.kill_time.strftime('%Y-%m-%d %H:%M') }}</p>
             <p><strong>Round:</strong> {{ kill_confirmation.round_number }}</p>
         </div>
-        
+
         {% if result == 'approved' %}
             <p>As a result of this confirmation:</p>
             <ul>
@@ -87,12 +87,12 @@
             </ul>
             <p>{{ victim.name }} remains active in the game.</p>
         {% endif %}
-        
+
         <div style="text-align: center;">
             <a href="{{ url_for('game.home', _external=True) }}" class="button">View Game Dashboard</a>
         </div>
     </div>
-    
+
     <div class="footer">
         <p>This is an automated message from the Senior Assassin game system. Please do not reply to this email.</p>
     </div>

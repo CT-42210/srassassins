@@ -9,6 +9,7 @@ from app.services.admin_service import (
     toggle_team_state, toggle_player_state, force_vote_decision,
     backup_database, execute_db_command, wipe_game, update_voting_threshold
 )
+from app.services.email_service import send_team_approval_notification
 
 admin = Blueprint('admin', __name__)
 
@@ -132,6 +133,7 @@ def approve_team(team_id):
     Accept a pending team into the game.
     """
     if accept_team(team_id):
+        send_team_approval_notification(team_id)
         flash('Team accepted successfully!', 'success')
     else:
         flash('Failed to accept team. Game may have already started.', 'danger')
