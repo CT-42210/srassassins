@@ -13,3 +13,5 @@ instance/
 
 migrations/
 !/app/static/uploads/
+
+app/static/uploads/
