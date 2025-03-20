@@ -1,0 +1,14 @@
+
+.idea/
+
+app/.DS_Store
+
+.DS_Store
+
+.env
+
+identifier.sqlite
+
+instance/
+
+migrations/
