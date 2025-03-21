@@ -180,18 +180,16 @@ def wipe_game():
 
         # 3. Clear uploads directory
         upload_folder = current_app.config['UPLOAD_FOLDER']
-        team_photos_dir = os.path.join(upload_folder, 'team_photos')
-        kill_videos_dir = os.path.join(upload_folder, 'kill_videos')
 
-        # Delete all files in team_photos and kill_videos directories
-        for directory in [team_photos_dir, kill_videos_dir]:
-            if os.path.exists(directory):
-                for file_path in glob.glob(os.path.join(directory, '*')):
-                    try:
-                        if os.path.isfile(file_path):
-                            os.unlink(file_path)
-                    except Exception as e:
-                        current_app.logger.warning(f"Failed to delete file {file_path}: {e}")
+
+        if os.path.exists(upload_folder):
+            for filename in os.listdir(upload_folder):
+                file_path = os.path.join(upload_folder, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                except Exception as e:
+                    current_app.logger.warning(f"Failed to delete file {file_path}: {e}")
 
         # 4. Add action log
         log = ActionLog(
