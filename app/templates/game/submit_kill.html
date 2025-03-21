@@ -116,5 +116,45 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+document.addEventListener('DOMContentLoaded', function() {
+    const videoInput = document.getElementById('kill_video');
+    const form = document.getElementById('kill-submit-form');
+
+    videoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+
+            video.onloadedmetadata = function() {
+                window.URL.revokeObjectURL(video.src);
+                if (video.duration > 30) {
+                    alert('The video must be 30 seconds or less.');
+                    videoInput.value = ''; // Clear the input
+                }
+            };
+
+            video.src = URL.createObjectURL(file);
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        const file = videoInput.files[0];
+        if (file) {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+
+            video.onloadedmetadata = function() {
+                window.URL.revokeObjectURL(video.src);
+                if (video.duration > 30) {
+                    alert('The video must be 30 seconds or less.');
+                    e.preventDefault(); // Prevent form submission
+                }
+            };
+
+            video.src = URL.createObjectURL(file);
+        }
+    });
+});
 </script>
 {% endblock %}

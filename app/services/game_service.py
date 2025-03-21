@@ -8,6 +8,7 @@ from flask import current_app
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
 from app.services.email_service import send_kill_submission_notification
 from app.services.instagram_service import post_kill_video_to_story, post_team_elimination_to_feed, post_game_winner_to_feed
+from app.services.media_service import process_video
 
 def assign_targets():
     """
@@ -87,7 +88,10 @@ def submit_kill(victim_id, attacker_id, kill_time, video_path):
 
     if existing_kill:
         return None
-    
+
+    # reformat and compress video
+    process_video(video_path)
+
     # Create a new kill confirmation
     kill_confirmation = KillConfirmation(
         victim_id=victim_id,
