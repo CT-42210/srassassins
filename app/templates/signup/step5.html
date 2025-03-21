@@ -49,7 +49,7 @@
                     <h3>Step 5: Team Photo</h3>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="{{ url_for('auth.signup') }}" enctype="multipart/form-data">
+                    <form method="post" action="{{ url_for('auth.signup') }}" enctype="multipart/form-data" id="signup-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         
                         <div class="mb-4">
@@ -103,4 +103,24 @@
         </div>
     </div>
 </div>
+<script>
+// Add this to your admin.js file or within a <script> tag in the template
+document.addEventListener('DOMContentLoaded', function() {
+  const signupForm = document.getElementById('signup-form');
+  if (signupForm) {
+    signupForm.addEventListener('submit', function(e) {
+      // Get the submit button
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalText = submitButton.innerHTML;
+
+      // Disable the button and show loading state
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+
+      // Form will continue submitting normally
+      // The button will remain disabled until page reloads with response
+    });
+  }
+});
+</script>
 {% endblock %}
