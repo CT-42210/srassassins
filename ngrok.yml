@@ -1,0 +1,7 @@
+version: "2"
+authtoken: YOUR_AUTH_TOKEN
+tunnels:
+  flask:
+    proto: http
+    addr: 42069
+    hostname: srassassin.ngrok.app
