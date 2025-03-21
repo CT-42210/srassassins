@@ -262,3 +262,14 @@ def send_kill_submission_notification(kill_confirmation):
     # Send to all players
     return send_all_players_email(subject, text_body, html_body)
 
+
+def send_custom_email(email, subject, content):
+    """
+    Send a custom plaintext email to a recipient.
+    """
+    # Use the existing send_email function with the email address as a list
+    return send_email(
+        subject=subject,
+        recipients=[email],
+        text_body=content
+    )

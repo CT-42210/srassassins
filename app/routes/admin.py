@@ -352,3 +352,52 @@ def execute_sql():
     else:
         flash(f'SQL command failed: {result}', 'danger')
         return redirect_with_tab('admin.dashboard')
+
+
+@admin.route('/send-mass-email', methods=['POST'])
+@admin_required
+def send_mass_email():
+    """
+    Send a custom email to all players in the game.
+    """
+    subject = request.form.get('email_subject')
+    content = request.form.get('email_content')
+    confirmation = request.form.get('confirmation') == 'yes'
+
+    if not confirmation:
+        flash('Please confirm the action by checking the confirmation box.', 'danger')
+        return redirect_with_tab('admin.dashboard')
+
+    if not subject or not content:
+        flash('Email subject and content are required.', 'danger')
+        return redirect_with_tab('admin.dashboard')
+
+    # Get all players with email addresses
+    players = Player.query.filter(Player.email != None).all()
+    if not players:
+        flash('No players with email addresses found.', 'danger')
+        return redirect_with_tab('admin.dashboard')
+
+    # Import email service
+    from app.services.email_service import send_custom_email
+
+    success_count = 0
+    for player in players:
+        if player.email:
+            try:
+                send_custom_email(player.email, subject, content)
+                success_count += 1
+            except Exception as e:
+                current_app.logger.error(f"Failed to send email to {player.email}: {str(e)}")
+
+    # Log the action
+    log = ActionLog(
+        action_type='mass_email',
+        description=f'Admin sent mass email "{subject}" to {success_count} players',
+        actor='admin'
+    )
+    db.session.add(log)
+    db.session.commit()
+
+    flash(f'Email sent successfully to {success_count} players!', 'success')
+    return redirect_with_tab('admin.dashboard')

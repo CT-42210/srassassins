@@ -96,6 +96,9 @@
                     <li class="nav-item">
                         <a class="nav-link admin-tab-link" href="#activity-logs" data-tab="activity-logs">Activity Logs</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link admin-tab-link" href="#mass-email" data-tab="mass-email">Mass Email</a>
+                    </li>
                 </ul>
                 <hr class="my-3 bg-light">
                 <div class="text-center">
@@ -773,6 +776,36 @@
                                 document.getElementById('actor_sql').value = sql;
                             }
                         </script>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mass Email Tab -->
+            <div id="mass-email" class="admin-tab-content d-none">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Send Mass Email</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Send a custom email to all players in the game.</p>
+
+                        <form action="{{ url_for('admin.send_mass_email') }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label for="email_subject" class="form-label">Email Subject</label>
+                                <input type="text" class="form-control" id="email_subject" name="email_subject" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email_content" class="form-label">Email Content</label>
+                                <textarea class="form-control" id="email_content" name="email_content" rows="10" required></textarea>
+                                <div class="form-text">Plain text only. No HTML formatting.</div>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="confirmation" name="confirmation" value="yes">
+                                <label class="form-check-label" for="confirmation">I confirm I want to send this email to all players</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Email</button>
+                        </form>
                     </div>
                 </div>
             </div>
