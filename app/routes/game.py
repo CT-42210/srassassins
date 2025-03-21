@@ -1,13 +1,13 @@
-import os
 import uuid
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, send_from_directory
+
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from app.models import db, Team, Player, KillConfirmation, GameState
+from app.services.email_service import send_team_elimination_notification
 from app.services.game_service import submit_kill as service_submit_kill
-from app.services.email_service import send_kill_submission_notification, send_team_elimination_notification
 
 game = Blueprint('game', __name__)
 

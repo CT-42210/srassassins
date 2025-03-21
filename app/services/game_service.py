@@ -1,14 +1,14 @@
-import os
+import json
+import datetime
 import json
 import random
-import datetime
-from sqlalchemy import func
-from flask import current_app
 
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
 from app.services.email_service import send_kill_submission_notification
-from app.services.instagram_service import post_kill_video_to_story, post_team_elimination_to_feed, post_game_winner_to_feed
+from app.services.instagram_service import post_kill_video_to_story, post_team_elimination_to_feed, \
+    post_game_winner_to_feed
 from app.services.media_service import process_video
+
 
 def assign_targets():
     """

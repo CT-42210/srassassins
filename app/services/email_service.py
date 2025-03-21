@@ -1,8 +1,10 @@
 import smtplib
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from flask import current_app, render_template
-from app.models import Player, Team, db
+
+from app.models import Player, Team
 
 
 def send_email(subject, recipients, text_body, html_body=None):

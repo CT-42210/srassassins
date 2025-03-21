@@ -1,10 +1,10 @@
 import os
 import uuid
+from datetime import datetime
+
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash
-from datetime import datetime
 
 from app.models import db, Team, Player, GameState, ActionLog
 from app.services.email_service import send_team_signup_notification

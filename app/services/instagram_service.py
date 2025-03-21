@@ -1,11 +1,10 @@
 import os
-import time
+
 from flask import current_app
 from instagrapi import Client
-
-from app.models import GameState, Team, Player
-
 from instagrapi.exceptions import LoginRequired
+
+from app.models import GameState, Player
 
 # Global Instagram client instance
 _instagram_client = None
@@ -208,8 +207,8 @@ def post_round_start_to_feed(round_number):
         bool: True if successful, False otherwise
     """
     # Get count of teams and players still alive
-    from app.models import Team, Player, GameState
-    
+    from app.models import Team, Player
+
     alive_teams = Team.query.filter_by(state='alive').count()
     alive_players = Player.query.filter_by(state='alive').count()
     
