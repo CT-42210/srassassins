@@ -158,8 +158,6 @@ def submit_kill_route():
         )
 
         if kill_confirmation:
-            # Send notification to all players to vote on this kill
-            send_kill_submission_notification(kill_confirmation)
 
             # Check if the victim's team is now eliminated
             victim = Player.query.get(victim_id)
@@ -182,3 +180,97 @@ def submit_kill_route():
 
     return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players,
                            now=datetime.now())
+
+
+@game.route('/voting')
+@login_required
+def voting():
+    """
+    Display kill confirmations that need votes.
+    """
+    # Get game state
+    game_state = GameState.query.first()
+
+    # Only allow voting during live game
+    if game_state.state != 'live':
+        flash('The game is not currently active.', 'danger')
+        return redirect(url_for('game.home'))
+
+    # Get kill confirmations for the current player
+    from app.services.game_service import get_kill_confirmations_for_voter
+    kill_confirmations = get_kill_confirmations_for_voter(current_user.id)
+
+    return render_template('game/voting.html',
+                           kill_confirmations=kill_confirmations,
+                           Team=Team,
+                           now=datetime.now())
+
+
+@game.route('/view-video/<kill_confirmation_id>')
+@login_required
+def view_video(kill_confirmation_id):
+    """
+    View a kill confirmation video.
+
+    Args:
+        kill_confirmation_id (str): ID of the kill confirmation
+    """
+    # Get the kill confirmation
+    kill_confirmation = KillConfirmation.query.get(kill_confirmation_id)
+
+    if not kill_confirmation:
+        flash('Kill confirmation not found.', 'danger')
+        return redirect(url_for('game.voting'))
+
+    # Get victim and attacker info
+    victim = Player.query.get(kill_confirmation.victim_id)
+    attacker = Player.query.get(kill_confirmation.attacker_id)
+    victim_team = Team.query.get(victim.team_id)
+    attacker_team = Team.query.get(attacker.team_id)
+
+    return render_template(
+        'game/view_video.html',
+        kill_confirmation=kill_confirmation,
+        victim=victim,
+        attacker=attacker,
+        victim_team=victim_team,
+        attacker_team=attacker_team,
+        now=datetime.now()
+    )
+
+
+@game.route('/vote/<kill_confirmation_id>/<vote_value>')
+@login_required
+def vote(kill_confirmation_id, vote_value):
+    """
+    Submit a vote for a kill confirmation.
+
+    Args:
+        kill_confirmation_id (str): ID of the kill confirmation
+        vote_value (str): 'approve' or 'reject'
+    """
+    # Get game state
+    game_state = GameState.query.first()
+
+    # Only allow voting during live game
+    if game_state.state != 'live':
+        flash('The game is not currently active.', 'danger')
+        return redirect(url_for('game.home'))
+
+    # Convert vote value to boolean
+    vote_bool = (vote_value == 'approve')
+
+    # Submit the vote
+    from app.services.game_service import vote_on_kill
+    success, message = vote_on_kill(
+        kill_confirmation_id=kill_confirmation_id,
+        voter_id=current_user.id,
+        vote=vote_bool
+    )
+
+    if success:
+        flash(message, 'success')
+    else:
+        flash(message, 'danger')
+
+    return redirect(url_for('game.voting'))

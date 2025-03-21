@@ -6,7 +6,7 @@ from sqlalchemy import func
 from flask import current_app
 
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
-from app.services.email_service import send_kill_submission_notification, send_kill_confirmation_result
+from app.services.email_service import send_kill_submission_notification
 from app.services.instagram_service import post_kill_video_to_story, post_team_elimination_to_feed, post_game_winner_to_feed
 
 def assign_targets():
@@ -77,6 +77,15 @@ def submit_kill(victim_id, attacker_id, kill_time, video_path):
     victim_team = Team.query.get(victim.team_id)
     
     if attacker_team.target_id != victim_team.id:
+        return None
+
+    existing_kill = KillConfirmation.query.filter_by(
+        victim_id=victim_id,
+        attacker_id=attacker_id,
+        status='pending'
+    ).first()
+
+    if existing_kill:
         return None
     
     # Create a new kill confirmation
@@ -202,7 +211,8 @@ def vote_on_kill(kill_confirmation_id, voter_id, vote):
     
     # Send notification if status changed
     if kill_confirmation.status in ['approved', 'rejected']:
-        send_kill_confirmation_result(kill_confirmation)
+        pass
+        # send to ellie
     
     return True, message
 
