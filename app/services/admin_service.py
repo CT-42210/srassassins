@@ -8,7 +8,6 @@ from werkzeug.security import check_password_hash
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
 from app.services.email_service import send_all_players_email
 from app.services.game_service import assign_targets, check_game_complete
-from app.services.instagram_service import post_to_story, post_round_start_to_feed
 
 
 def verify_admin_password(password):

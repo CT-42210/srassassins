@@ -295,7 +295,7 @@
                                 <h5 class="card-title mb-0">Change Game State</h5>
                             </div>
                             <div class="card-body">
-                                <form action="{{ url_for('admin.update_game_state', tab='game-control') }}" method="post" class="admin-action-form">
+                                <form action="{{ url_for('admin.update_game_state', tab='game-control') }}" method="post" class="admin-action-form loading-form">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                     <div class="mb-3">
@@ -330,7 +330,7 @@
                                 <h5 class="card-title mb-0">Update Voting Threshold</h5>
                             </div>
                             <div class="card-body">
-                                <form action="{{ url_for('admin.change_voting_threshold', tab='game-control') }}" method="post" class="admin-action-form">
+                                <form action="{{ url_for('admin.change_voting_threshold', tab='game-control') }}" method="post" class="loading-form admin-action-form">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                     <div class="mb-3">
@@ -364,7 +364,7 @@
                                 <h5 class="card-title mb-0">Manual Round Control</h5>
                             </div>
                             <div class="card-body">
-                                <form action="{{ url_for('admin.new_round', tab='game-control') }}" method="post" class="admin-action-form">
+                                <form action="{{ url_for('admin.new_round', tab='game-control') }}" method="post" class="admin-action-form loading-form">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                     <p>
@@ -403,7 +403,7 @@
                                 <h5 class="card-title mb-0">Reset Game</h5>
                             </div>
                             <div class="card-body">
-                                <form action="{{ url_for('admin.reset_game', tab='game-control') }}" method="post" class="admin-action-form">
+                                <form action="{{ url_for('admin.reset_game', tab='game-control') }}" method="post" class="admin-action-form loading-form">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                     <div class="alert alert-danger">
@@ -450,7 +450,7 @@
                         <h5 class="card-title mb-0">Automated Round Schedule</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ url_for('admin.schedule_round', tab='game-control') }}" method="post" class="admin-action-form">
+                        <form action="{{ url_for('admin.schedule_round', tab='game-control') }}" method="post" class="admin-action-form loading-form">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                             <div class="row">
@@ -527,6 +527,7 @@
                                         </td>
                                         <td>{{ confirmation.expiration_time.strftime('%Y-%m-%d %H:%M') }}</td>
                                         <td class="action-buttons">
+                                            <a href="{{ url_for('admin.view_kill_admin', kill_confirmation_id=confirmation.id, tab='vote-management') }}" class="btn btn-sm btn-info">View Video</a>
                                             <a href="{{ url_for('admin.force_vote', kill_confirmation_id=confirmation.id, decision='approve', tab='vote-management') }}" class="btn btn-sm btn-success">Approve</a>
                                             <a href="{{ url_for('admin.force_vote', kill_confirmation_id=confirmation.id, decision='reject', tab='vote-management') }}" class="btn btn-sm btn-danger">Reject</a>
                                         </td>
@@ -548,7 +549,7 @@
                     </div>
                     <div class="card-body">
                         <p>View and analyze past kill confirmations:</p>
-                        <form action="{{ url_for('admin.execute_sql', tab='vote-management') }}" method="post" class="admin-action-form">
+                        <form action="{{ url_for('admin.execute_sql', tab='vote-management') }}" method="post" class="admin-action-form loading-form">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="confirmation" value="yes">
                             <input type="hidden" name="sql_command" value="SELECT kc.id, p1.name as victim, p2.name as attacker, t1.name as victim_team, t2.name as attacker_team, kc.kill_time, kc.round_number, kc.status FROM kill_confirmations kc JOIN players p1 ON kc.victim_id = p1.id JOIN players p2 ON kc.attacker_id = p2.id JOIN teams t1 ON p1.team_id = t1.id JOIN teams t2 ON p2.team_id = t2.id ORDER BY kc.kill_time DESC LIMIT 50;">
@@ -572,7 +573,7 @@
                             <strong>Warning:</strong> This feature allows direct execution of SQL commands on the database. Use with extreme caution.
                         </div>
 
-                        <form action="{{ url_for('admin.execute_sql', tab='database-management') }}" method="post" class="admin-action-form">
+                        <form action="{{ url_for('admin.execute_sql', tab='database-management') }}" method="post" class="admin-action-form loading-form">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                             <div class="mb-3">
@@ -685,7 +686,7 @@
                         </div>
 
                         <div class="text-center mt-4">
-                            <form action="{{ url_for('admin.execute_sql', tab='activity-logs') }}" method="post" class="admin-action-form">
+                            <form action="{{ url_for('admin.execute_sql', tab='activity-logs') }}" method="post" class="admin-action-form loading-form">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="confirmation" value="yes">
                                 <input type="hidden" name="sql_command" value="SELECT * FROM action_logs ORDER BY timestamp DESC LIMIT 100;">
@@ -729,7 +730,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <form action="{{ url_for('admin.execute_sql', tab='activity-logs') }}" method="post" class="admin-action-form">
+                                <form action="{{ url_for('admin.execute_sql', tab='activity-logs') }}" method="post" class="admin-action-form loading-form">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="confirmation" value="yes">
 
@@ -789,7 +790,7 @@
                     <div class="card-body">
                         <p class="text-muted">Send a custom email to all players in the game.</p>
 
-                        <form action="{{ url_for('admin.send_mass_email') }}" method="POST">
+                        <form action="{{ url_for('admin.send_mass_email') }}" method="POST" class="loading-form">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="mb-3">
                                 <label for="email_subject" class="form-label">Email Subject</label>

@@ -8,6 +8,9 @@ from werkzeug.utils import secure_filename
 from app.models import db, Team, Player, KillConfirmation, GameState
 from app.services.email_service import send_team_elimination_notification
 from app.services.game_service import submit_kill as service_submit_kill
+from app.services.media_service import process_video
+from app.services.instagram_service import send_ellie
+
 
 game = Blueprint('game', __name__)
 
@@ -146,6 +149,9 @@ def submit_kill_route():
         print(file_path)
         file.save(file_path)
 
+        # reformat and compress video
+        process_video(file_path)
+
         # The relative path that will be stored in the database
         relative_path = f"uploads/{unique_filename}"
 
@@ -173,6 +179,7 @@ def submit_kill_route():
                     send_team_elimination_notification(victim_team.id)
 
             flash('Kill submitted successfully and pending confirmation.', 'success')
+            send_ellie("Hey Ellie, its your friendly automated email bot, Johannes Wabnitz Mbot.  Now don't get confused between me (the bot), and the cool, handsome awesome Johannes Wabnitz Moch (I wish i could be like him).  Anyways, I have a video I need you to put on instagram, anyway you could do me that favor?  Thanks!!! - Love Johannes Wabnitz Mbot (NOT JOHANNES WABNITZ MOCH)", video_path=file_path)
             return redirect(url_for('game.home'))
         else:
             flash('Failed to submit kill. Please check your inputs and try again.', 'danger')
@@ -235,6 +242,7 @@ def view_video(kill_confirmation_id):
         attacker=attacker,
         victim_team=victim_team,
         attacker_team=attacker_team,
+        game_state=GameState,
         now=datetime.now()
     )
 

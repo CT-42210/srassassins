@@ -20,7 +20,7 @@
                         </div>
                     </div>
                     
-                    <form method="post" action="{{ url_for('admin.login') }}">
+                    <form method="post" action="{{ url_for('admin.login') }}" class="loading-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         
                         <div class="mb-3">

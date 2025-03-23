@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     
-                    <form method="post" action="{{ url_for('game.submit_kill_route') }}" enctype="multipart/form-data" class="kill-submission-form" id="kill-submit-form">
+                    <form method="post" action="{{ url_for('game.submit_kill_route') }}" enctype="multipart/form-data" class="kill-submission-form loading-form" id="kill-submit-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         
                         <div class="mb-4">
@@ -98,24 +98,6 @@
     </div>
 </div>
 <script>
-// Add this to your admin.js file or within a <script> tag in the template
-document.addEventListener('DOMContentLoaded', function() {
-  const signupForm = document.getElementById('kill-submit-form');
-  if (signupForm) {
-    signupForm.addEventListener('submit', function(e) {
-      // Get the submit button
-      const submitButton = this.querySelector('button[type="submit"]');
-      const originalText = submitButton.innerHTML;
-
-      // Disable the button and show loading state
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
-
-      // Form will continue submitting normally
-      // The button will remain disabled until page reloads with response
-    });
-  }
-});
 document.addEventListener('DOMContentLoaded', function() {
     const videoInput = document.getElementById('kill_video');
     const form = document.getElementById('kill-submit-form');

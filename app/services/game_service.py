@@ -5,9 +5,7 @@ import random
 
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
 from app.services.email_service import send_kill_submission_notification
-from app.services.instagram_service import post_kill_video_to_story, post_team_elimination_to_feed, \
-    post_game_winner_to_feed
-from app.services.media_service import process_video
+# from app.services.instagram_service
 
 
 def assign_targets():
@@ -89,9 +87,6 @@ def submit_kill(victim_id, attacker_id, kill_time, video_path):
     if existing_kill:
         return None
 
-    # reformat and compress video
-    process_video(video_path)
-
     # Create a new kill confirmation
     kill_confirmation = KillConfirmation(
         victim_id=victim_id,
@@ -118,8 +113,7 @@ def submit_kill(victim_id, attacker_id, kill_time, video_path):
     
     # Send notifications
     send_kill_submission_notification(kill_confirmation)
-    post_kill_video_to_story(kill_confirmation)
-    
+
     return kill_confirmation
 
 def vote_on_kill(kill_confirmation_id, voter_id, vote):
@@ -253,9 +247,7 @@ def confirm_kill(kill_confirmation):
     victim_team = Team.query.get(victim.team_id)
     if all(not player.is_alive for player in victim_team.players):
         victim_team.state = 'dead'
-        
-        # Post team elimination to Instagram
-        post_team_elimination_to_feed(victim_team)
+
     
     # Log the action
     log = ActionLog(
@@ -308,9 +300,6 @@ def check_game_complete():
         
         # Commit changes
         db.session.commit()
-        
-        # Post to Instagram
-        post_game_winner_to_feed(winning_team)
         
         return True
     

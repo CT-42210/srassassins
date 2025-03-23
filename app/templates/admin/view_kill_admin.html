@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Review Kill Confirmation</h2>
+
+    <div class="card">
+        <div class="card-header">
+            Kill Confirmation #{{ kill.id }}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Status: {{ kill.status }}</h5>
+            <p class="card-text">Submitted on: {{ kill.kill_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p class="card-text">Created at: {{ kill.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p class="card-text">Expires on: {{ kill.expiration_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p class="card-text">Round: {{ kill.round_number }}</p>
+
+            <!-- Display player information -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Attacker:</strong> {{ kill.attacker.name }}</p>
+                    <p><strong>Attacker ID:</strong> {{ kill.attacker_id }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Victim:</strong> {{ kill.victim.name }}</p>
+                    <p><strong>Victim ID:</strong> {{ kill.victim_id }}</p>
+                </div>
+            </div>
+
+            <!-- Video section -->
+            {% if kill.video_path %}
+            <div class="mb-4">
+                <h5>Kill Video</h5>
+                <video width="100%" controls>
+                    <!-- Remove the duplicate "uploads/" path -->
+                    <source src="{{ url_for('static', filename='uploads/' + kill.video_path.replace('uploads/', '').strip('/')) }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            {% endif %}
+
+            <!-- Votes section -->
+            <div class="mb-4">
+                <h5>Votes</h5>
+                {% if kill.votes %}
+                    <p>{{ kill.votes|length }} / {{ threshold }} required</p>
+                    <ul class="list-group">
+                        {% for vote in kill.votes %}
+                        <li class="list-group-item">
+                            Vote information
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No votes available</p>
+                {% endif %}
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ url_for('admin.force_vote', kill_confirmation_id=kill.id, decision='approve', tab=request.args.get('tab')) }}" class="btn btn-success mr-2">Force Approve</a>
+                <a href="{{ url_for('admin.force_vote', kill_confirmation_id=kill.id, decision='reject', tab=request.args.get('tab')) }}" class="btn btn-danger">Force Reject</a>
+                <a href="{{ url_for('admin.dashboard', tab=request.args.get('tab')) }}" class="btn btn-secondary ml-2">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

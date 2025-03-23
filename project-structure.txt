@@ -13,7 +13,6 @@ senior_assassin/
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── email_service.py   # Email functionality
-│   │   ├── instagram_service.py # Instagram functionality
 │   │   ├── game_service.py    # Game logic and management
 │   │   └── admin_service.py   # Admin services
 │   ├── static/

@@ -110,7 +110,7 @@
                         </ol>
                     </div>
                     
-                    <form method="post" action="{{ url_for('auth.signup') }}">
+                    <form method="post" action="{{ url_for('auth.signup') }}" class="loading-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         
                         <div class="form-check mb-4">

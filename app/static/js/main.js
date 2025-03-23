@@ -140,3 +140,28 @@ document.addEventListener('DOMContentLoaded', function() {
         adminTabs[0].click();
     }
 });
+
+/**
+ * Applies loading state to submit buttons when forms are submitted
+ * Usage: Add class "loading-form" to any form that should show loading state
+ */
+function initFormLoadingIndicators() {
+  const loadingForms = document.querySelectorAll('.loading-form');
+
+  loadingForms.forEach(form => {
+    form.addEventListener('submit', function() {
+      const submitButton = this.querySelector('button[type="submit"]');
+      if (submitButton) {
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+      }
+    });
+  });
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  initFormLoadingIndicators();
+});
+

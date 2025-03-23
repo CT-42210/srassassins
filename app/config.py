@@ -23,10 +23,10 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
-    
+
     # Instagram configuration
     INSTAGRAM_USERNAME = os.environ.get('INSTAGRAM_USERNAME')
-    INSTAGRAM_PASSWORD = os.environ.get('INSTAGRAM_PASSWORD')
+    ELLIEMAIL = os.environ.get('ELLIEEMAIL')
     
     # Backup configuration
     BACKUP_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backups')

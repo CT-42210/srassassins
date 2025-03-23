@@ -1,248 +1,87 @@
+import smtplib
 import os
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
 
-from flask import current_app
-from instagrapi import Client
-from instagrapi.exceptions import LoginRequired
-
-from app.models import GameState, Player
-
-# Global Instagram client instance
-_instagram_client = None
-
-def get_instagram_client():
+def send_ellie(text_body, video_path, recipients=[], html_body=None):
+    from flask import current_app
+    recipients = [current_app.config["ELLIEMAIL"]]
     """
-    Get a logged-in Instagram client instance.
-    
-    Returns:
-        Client: Logged-in Instagram client instance
-    """
-    global _instagram_client
-    
-    if _instagram_client is not None:
-        try:
-            # Test if the client is still logged in
-            _instagram_client.get_timeline_feed()
-            return _instagram_client
-        except LoginRequired:
-            # Client is no longer logged in, create a new one
-            _instagram_client = None
-    
-    # Create and login a new client
-    client = Client()
-    username = current_app.config['INSTAGRAM_USERNAME']
-    password = current_app.config['INSTAGRAM_PASSWORD']
-    
-    try:
-        # Try to load session if it exists
-        session_file = os.path.join(current_app.instance_path, 'instagram_session.json')
-        if os.path.exists(session_file):
-            client.load_settings(session_file)
-            client.login(username, password)
-        else:
-            # Login with credentials
-            client.login(username, password)
-            # Save session for future use
-            os.makedirs(current_app.instance_path, exist_ok=True)
-            client.dump_settings(session_file)
-        
-        _instagram_client = client
-        return client
-    
-    except Exception as e:
-        current_app.logger.error(f"Instagram login failed: {str(e)}")
-        raise
-
-def post_to_feed(image_path, caption):
-    """
-    Post an image with a caption to the Instagram feed.
-    
+    Send an email with the given body text and an attached MP4 video to the specified recipients.
     Args:
-        image_path (str): Path to the image file
-        caption (str): Caption for the post
-    
+        text_body (str): Plain text email body
+        video_path (str): Path to the MP4 video file to attach
+        recipients (list): List of email addresses
+        html_body (str, optional): HTML email body
     Returns:
         bool: True if successful, False otherwise
     """
     try:
-        client = get_instagram_client()
-        
-        # Upload the photo
-        media = client.photo_upload(
-            image_path,
-            caption
+        # Check if video file exists
+        if not os.path.exists(video_path):
+            current_app.logger.error(f'Video file not found: {video_path}')
+            return False
+
+        msg = MIMEMultipart('mixed')  # Changed to 'mixed' to support attachments
+        msg['Subject'] = "New Video for Instagram"
+        msg['From'] = current_app.config['MAIL_DEFAULT_SENDER']
+        msg['To'] = ', '.join(recipients)
+
+        # Create alternative part for text/html content
+        alt_part = MIMEMultipart('alternative')
+
+        # Attach text part
+        text_part = MIMEText(text_body, 'plain')
+        alt_part.attach(text_part)
+
+        # Attach HTML part if provided
+        if html_body:
+            html_part = MIMEText(html_body, 'html')
+            alt_part.attach(html_part)
+
+        # Add the text/html parts to the message
+        msg.attach(alt_part)
+
+        # Attach the video file
+        with open(video_path, 'rb') as video_file:
+            video_attachment = MIMEApplication(video_file.read())
+            video_filename = os.path.basename(video_path)
+            video_attachment.add_header(
+                'Content-Disposition',
+                f'attachment; filename="{video_filename}"'
+            )
+            video_attachment.add_header('Content-Type', 'video/mp4')
+            msg.attach(video_attachment)
+
+        # Connect to the mail server
+        server = smtplib.SMTP(
+            current_app.config['MAIL_SERVER'],
+            current_app.config['MAIL_PORT']
         )
-        
-        current_app.logger.info(f"Instagram post created: {media.pk}")
+        if current_app.config['MAIL_USE_TLS']:
+            server.starttls()
+
+        # Login if credentials are provided
+        if current_app.config['MAIL_USERNAME'] and current_app.config['MAIL_PASSWORD']:
+            server.login(
+                current_app.config['MAIL_USERNAME'],
+                current_app.config['MAIL_PASSWORD']
+            )
+
+        # Send the email
+        server.sendmail(
+            current_app.config['MAIL_DEFAULT_SENDER'],
+            recipients,
+            msg.as_string()
+        )
+
+        # Close the connection
+        server.quit()
+
+        current_app.logger.info(f'Email with video attachment sent to Ellie: New Video for Instagram')
         return True
-    
+
     except Exception as e:
-        current_app.logger.error(f"Failed to post to Instagram feed: {str(e)}")
+        current_app.logger.error(f'Failed to send email with video: {str(e)}')
         return False
-
-def post_to_story(image_path=None, video_path=None, text=None):
-    """
-    Post a story to Instagram.
-    
-    Args:
-        image_path (str, optional): Path to the image file
-        video_path (str, optional): Path to the video file
-        text (str, optional): Text to overlay on the story
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    try:
-        client = get_instagram_client()
-        
-        if video_path:
-            # Upload video to story
-            media = client.video_upload_to_story(
-                video_path,
-                caption=text
-            )
-        elif image_path:
-            # Upload image to story
-            media = client.photo_upload_to_story(
-                image_path,
-                caption=text
-            )
-        else:
-            # Create a black background with text
-            from PIL import Image, ImageDraw, ImageFont
-            
-            # Create a black image
-            img = Image.new('RGB', (1080, 1920), color='black')
-            
-            # Add text if provided
-            if text:
-                # Initialize drawing context
-                draw = ImageDraw.Draw(img)
-                
-                # Use a default font
-                try:
-                    font = ImageFont.truetype("arial.ttf", 60)
-                except IOError:
-                    font = ImageFont.load_default()
-                
-                # Calculate text position for center alignment
-                text_width, text_height = draw.textsize(text, font=font)
-                position = ((1080 - text_width) / 2, (1920 - text_height) / 2)
-                
-                # Draw the text
-                draw.text(position, text, fill='white', font=font)
-            
-            # Save the image to a temporary file
-            temp_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'temp_story.jpg')
-            img.save(temp_path)
-            
-            # Upload to story
-            media = client.photo_upload_to_story(
-                temp_path
-            )
-            
-            # Remove the temporary file
-            os.remove(temp_path)
-        
-        current_app.logger.info(f"Instagram story created: {media.pk}")
-        return True
-    
-    except Exception as e:
-        current_app.logger.error(f"Failed to post to Instagram story: {str(e)}")
-        return False
-
-def post_kill_video_to_story(kill_confirmation):
-    """
-    Post a kill confirmation video to Instagram story.
-    
-    Args:
-        kill_confirmation: KillConfirmation object
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    from app.models import Player, Team
-    
-    # Get victim and attacker info
-    victim = Player.query.get(kill_confirmation.victim_id)
-    attacker = Player.query.get(kill_confirmation.attacker_id)
-    victim_team = Team.query.get(victim.team_id)
-    attacker_team = Team.query.get(attacker.team_id)
-    
-    # Create caption for the story
-    text = f"KILL SUBMISSION\n{attacker.name} ({attacker_team.name}) claims to have eliminated {victim.name} ({victim_team.name})"
-    
-    # Post to story
-    return post_to_story(
-        video_path=kill_confirmation.video_path,
-        text=text
-    )
-
-def post_team_elimination_to_feed(team):
-    """
-    Post a team elimination announcement to Instagram feed.
-    
-    Args:
-        team: Team object that has been eliminated
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    # Caption for the post
-    caption = f"TEAM ELIMINATED\n\nTeam {team.name} has been completely eliminated from the game!\n\nRound: {GameState.query.first().round_number}"
-    
-    # Post to feed with team photo
-    return post_to_feed(
-        image_path=team.photo_path,
-        caption=caption
-    )
-
-def post_round_start_to_feed(round_number):
-    """
-    Post a round start announcement to Instagram feed.
-    
-    Args:
-        round_number (int): Current round number
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    # Get count of teams and players still alive
-    from app.models import Team, Player
-
-    alive_teams = Team.query.filter_by(state='alive').count()
-    alive_players = Player.query.filter_by(state='alive').count()
-    
-    # Caption for the post
-    caption = f"ROUND {round_number} BEGINS\n\n{alive_teams} teams and {alive_players} players remain in the game.\n\nGood luck, and may the odds be ever in your favor!"
-    
-    # Use a default round start image
-    image_path = os.path.join(current_app.root_path, 'static', 'img', 'round_start.jpg')
-    
-    # Post to feed
-    return post_to_feed(
-        image_path=image_path,
-        caption=caption
-    )
-
-def post_game_winner_to_feed(winning_team):
-    """
-    Post the game winner announcement to Instagram feed.
-    
-    Args:
-        winning_team: Team object that has won the game
-    
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    # Get players in the winning team
-    players = Player.query.filter_by(team_id=winning_team.id).all()
-    player_names = ', '.join([player.name for player in players])
-    
-    # Caption for the post
-    caption = f"GAME OVER - WE HAVE A WINNER!\n\nCongratulations to Team {winning_team.name} ({player_names}) for winning Senior Assassin!\n\nKill Count: {winning_team.eliminations}\n\nThank you to everyone who participated!"
-    
-    # Post to feed with team photo
-    return post_to_feed(
-        image_path=winning_team.photo_path,
-        caption=caption
-    )

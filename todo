@@ -1,7 +1,8 @@
-- icon across the site
-- ellie instagram service
-- make voting feature modular
-- add view kill button to administrator page with administrator approval
+- make sure mov can be uploaded
+- fix full screen for users
+- try catch for elle
+- image on signup for ellie
 
+- make voting feature modular
 
 - how to migrate flask to wsgi https://www.youtube.com/watch?v=w0QDAg85Oow

@@ -401,3 +401,28 @@ def send_mass_email():
 
     flash(f'Email sent successfully to {success_count} players!', 'success')
     return redirect_with_tab('admin.dashboard')
+
+
+@admin.route('/view_kill_admin/<kill_confirmation_id>')
+@admin_required
+def view_kill_admin(kill_confirmation_id):
+    try:
+        # Get kill confirmation details
+        kill = KillConfirmation.query.get_or_404(kill_confirmation_id)
+        threshold = GameState.query.first().voting_threshold
+
+        # Add debug logging
+        current_app.logger.info(f"Viewing kill confirmation: {kill_confirmation_id}")
+        current_app.logger.info(f"Kill data: {kill}")
+
+        return render_template(
+            'admin/view_kill_admin.html',
+            kill=kill,
+            threshold=threshold,
+            tab=request.args.get('tab', 'vote-management'),
+            now=datetime.now()
+        )
+    except Exception as e:
+        current_app.logger.error(f"Error viewing kill: {str(e)}")
+        flash(f"Error loading kill confirmation: {str(e)}", "danger")
+        return redirect(url_for('admin.dashboard'))
