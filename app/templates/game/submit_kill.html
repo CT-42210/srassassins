@@ -101,6 +101,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const videoInput = document.getElementById('kill_video');
     const form = document.getElementById('kill-submit-form');
+    const previewContainer = document.getElementById('kill_video-preview');
 
     videoInput.addEventListener('change', function() {
         const file = this.files[0];
@@ -113,6 +114,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (video.duration > 30) {
                     alert('The video must be 30 seconds or less.');
                     videoInput.value = ''; // Clear the input
+                    setTimeout(() => {
+                        window.location.reload(); // Force page refresh
+                    }, 500);
+                } else {
+                    // Show video preview
+                    previewContainer.innerHTML = '';
+                    const previewVideo = document.createElement('video');
+                    previewVideo.src = URL.createObjectURL(file);
+                    previewVideo.controls = true;
+                    previewVideo.style.maxWidth = '100%';
+                    previewVideo.style.maxHeight = '300px';
+                    previewContainer.appendChild(previewVideo);
                 }
             };
 
@@ -121,21 +134,32 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Always prevent default to check video
+
         const file = videoInput.files[0];
-        if (file) {
-            const video = document.createElement('video');
-            video.preload = 'metadata';
-
-            video.onloadedmetadata = function() {
-                window.URL.revokeObjectURL(video.src);
-                if (video.duration > 30) {
-                    alert('The video must be 30 seconds or less.');
-                    e.preventDefault(); // Prevent form submission
-                }
-            };
-
-            video.src = URL.createObjectURL(file);
+        if (!file) {
+            alert('Please select a video file.');
+            return;
         }
+
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+
+        video.onloadedmetadata = function() {
+            window.URL.revokeObjectURL(video.src);
+            if (video.duration > 30) {
+                alert('The video must be 30 seconds or less. The page will now refresh.');
+                setTimeout(() => {
+                    window.location.reload(); // Force page refresh
+                }, 500);
+            } else {
+                // Submit the form if video is valid
+                form.removeEventListener('submit', arguments.callee);
+                form.submit();
+            }
+        };
+
+        video.src = URL.createObjectURL(file);
     });
 });
 </script>

@@ -1,8 +1,8 @@
 - make sure mov can be uploaded
-- fix full screen for users
-- try catch for elle
 - image on signup for ellie
+
+- make sure votes show up correctly everywhere (make threshold 3)
 
 - make voting feature modular
 
-- how to migrate flask to wsgi https://www.youtube.com/watch?v=w0QDAg85Oow
+- flask to wsgi https://www.youtube.com/watch?v=w0QDAg85Oow

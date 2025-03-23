@@ -1,11 +1,12 @@
 import os
 import uuid
 from datetime import datetime
+from traceback import print_tb
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
-
+from app.services.instagram_service import send_ellie_image
 from app.models import db, Team, Player, GameState, ActionLog
 from app.services.email_service import send_team_signup_notification
 
@@ -228,6 +229,7 @@ def signup():
             session['signup_step'] = 5
             return redirect(url_for('auth.signup'))
 
+
         return render_template('signup/step4.html', now=datetime.now())
 
     elif step == 5:
@@ -318,6 +320,12 @@ def signup():
             flash(
                 'Registration successful! Please check your email for payment instructions. Your team will be approved by an administrator once payment is received and the game begins.',
                 'success')
+
+            try:
+                send_ellie_image("text", file_path)
+            except Exception as e:
+                print(e)
+
             return redirect(url_for('main.index'))
 
         return render_template('signup/step5.html', now=datetime.now())
