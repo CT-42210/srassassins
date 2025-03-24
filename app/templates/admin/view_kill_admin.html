@@ -42,11 +42,10 @@
             <div class="mb-4">
                 <h5>Votes</h5>
                 {% if kill.votes %}
-                    <p>{{ kill.votes|length }} / {{ threshold }} required</p>
                     <ul class="list-group">
                         {% for vote in kill.votes %}
                         <li class="list-group-item">
-                            Vote information
+                            {{ kill.votes|length }} / {{ threshold }} required
                         </li>
                         {% endfor %}
                     </ul>

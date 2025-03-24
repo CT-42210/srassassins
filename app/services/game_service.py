@@ -44,6 +44,71 @@ def assign_targets():
     
     return True
 
+
+def kill_teams():
+    game_state = GameState.query.first()
+
+    # Set round start time
+    game_state.round_start = datetime.datetime.utcnow()
+    teams = Team.query.filter_by(state='alive').all()
+
+    # lists of teams and players to be eliminated
+    eliminated_teams = []
+    eliminated_players = []
+
+    # find teams whos targets are still alive and append them to the list
+    for team in teams:
+        target = team.target_id
+        target_state = Team.query.get(target).state
+        if target_state == 'alive':
+            eliminated_teams.append(team)
+            for player in team.players:
+                eliminated_players.append(player)
+
+    # kill teams and log
+    for team in eliminated_teams:
+        team.state = 'dead'
+
+        log = ActionLog(
+            action_type='team_elimination',
+            description=f'team {team.name} eliminated in round {game_state.round_number}',
+            actor='system'
+        )
+        db.session.add(log)
+
+    # kill players
+    for player in eliminated_players:
+        player.state = 'dead'
+
+    # Save Changes
+    db.session.commit()
+
+
+def increment_rounds():
+    game_state = GameState.query.first()
+    game_state.round_start = datetime.datetime.utcnow()
+    game_state.round_number += 1
+
+
+def revive_players():
+    game_state = GameState.query.first()
+    teams = Team.query.filter_by(state='alive').all()
+    for team in teams:
+        for player in team.players:
+            if not player.is_alive:
+                player.state = 'alive'
+
+                # Log the revival
+                log = ActionLog(
+                    action_type='player_revival',
+                    description=f'Player {player.name} revived for round {game_state.round_number}',
+                    actor='system'
+                )
+                db.session.add(log)
+
+    # Commit changes
+    db.session.commit()
+
 def submit_kill(victim_id, attacker_id, kill_time, video_path):
     """
     Submit a kill for confirmation.

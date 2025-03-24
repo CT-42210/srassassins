@@ -1,14 +1,14 @@
 import os
 import uuid
 from datetime import datetime
-from traceback import print_tb
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
-from app.services.instagram_service import send_ellie_image
+
 from app.models import db, Team, Player, GameState, ActionLog
 from app.services.email_service import send_team_signup_notification
+from app.services.instagram_service import send_ellie_image
 
 auth = Blueprint('auth', __name__)
 

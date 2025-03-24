@@ -211,24 +211,25 @@ def reset_game():
     return redirect_with_tab('admin.dashboard')
 
 
-@admin.route('/start-round', methods=['POST'])
+@admin.route('/new_round', methods=['POST'])
 @admin_required
 def new_round():
-    """
-    Start a new round of the game.
-    """
-    confirmation = request.form.get('confirmation') == 'yes'
+    if 'confirmation' not in request.form:
+        flash('Please confirm the action before proceeding.', 'danger')
+        return redirect(url_for('admin.dashboard', tab='game-control'))
 
-    if not confirmation:
-        flash('Please confirm the action by checking the confirmation box.', 'danger')
-        return redirect_with_tab('admin.dashboard')
+    # Check if we should increment the round number
+    increment = 'no_increment' not in request.form
 
-    if start_round(increment=True):
-        flash('New round started successfully!', 'success')
+    if start_round(increment=increment):
+        if increment:
+            flash('New round started successfully!', 'success')
+        else:
+            flash('Round refreshed successfully without incrementing round number!', 'success')
     else:
         flash('Failed to start new round.', 'danger')
 
-    return redirect_with_tab('admin.dashboard')
+    return redirect(url_for('admin.dashboard', tab='game-control'))
 
 
 @admin.route('/set-schedule', methods=['POST'])

@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash
 
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
 from app.services.email_service import send_all_players_email
-from app.services.game_service import assign_targets, check_game_complete
+from app.services.game_service import assign_targets, check_game_complete, increment_rounds, kill_teams, revive_players
 
 
 def verify_admin_password(password):
@@ -310,48 +310,35 @@ def start_round(increment=False):
     # Get game state
     game_state = GameState.query.first()
 
-    # Increment round number if requested
-    if increment:
-        game_state.round_number += 1
+    # kill teams that did not eliminate the thing
+    if game_state.round_number == 0:  # do not run if game has not started yet
+        pass
+    else:
+        kill_teams()
 
-    # Set round start time
-    game_state.round_start = datetime.datetime.utcnow()
+    #make sure winning team isnt decided by round change
+    if not check_game_complete():
+        # Assign targets to remaining teams
+        assign_targets()
 
-    # Assign targets to teams
-    assign_targets()
+        # Increment round number if requested
+        if increment:
+            increment_rounds()
 
-    # Revive eliminated players in surviving teams
-    teams = Team.query.filter_by(state='alive').all()
-    for team in teams:
-        for player in team.players:
-            if not player.is_alive:
-                player.state = 'alive'
+        # Revive eliminated players in surviving teams
+        revive_players()
 
-                # Log the revival
-                log = ActionLog(
-                    action_type='player_revival',
-                    description=f'Player {player.name} revived for round {game_state.round_number}',
-                    actor='system'
-                )
-                db.session.add(log)
+        # Send notifications
+        send_all_players_email(
+            subject=f"Senior Assassin - Round {game_state.round_number} Started",
+            text_body=f"Round {game_state.round_number} has started! Log in to see your new target."
+        )
 
-    # Commit changes
-    db.session.commit()
 
-    # Send notifications
-    send_all_players_email(
-        subject=f"Senior Assassin - Round {game_state.round_number} Started",
-        text_body=f"Round {game_state.round_number} has started! Log in to see your new target."
-    )
+        # Log the event
+        current_app.logger.info(f'Started round {game_state.round_number}')
 
-    # Post to Instagram
-    post_round_start_to_feed(game_state.round_number)
-    post_to_story(text=f"ROUND {game_state.round_number} HAS BEGUN!")
-
-    # Log the event
-    current_app.logger.info(f'Started round {game_state.round_number}')
-
-    return True
+        return True
 
 
 def set_round_schedule(round_start, round_end):

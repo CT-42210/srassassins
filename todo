@@ -1,8 +1,6 @@
 - make sure mov can be uploaded
 - image on signup for ellie
 
-- make sure votes show up correctly everywhere (make threshold 3)
-
 - make voting feature modular
 
 - flask to wsgi https://www.youtube.com/watch?v=w0QDAg85Oow

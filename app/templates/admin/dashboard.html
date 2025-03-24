@@ -374,13 +374,18 @@
                                     <div class="alert alert-info">
                                         Starting a new round will:
                                         <ul>
-                                            <li>Increment the round number</li>
+                                            <li>Increment round number (if not checked)</li>
                                             <li>Assign new targets to all teams</li>
                                             <li>Revive eliminated players in surviving teams</li>
                                             <li>Send notifications to all players</li>
                                         </ul>
                                     </div>
-
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="no_increment" name="no_increment" value="yes">
+                                        <label class="form-check-label" for="no_increment">
+                                            Do not increment round number
+                                        </label>
+                                    </div>
                                     <div class="confirmation-checkbox">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="round_confirmation" name="confirmation" value="yes">
@@ -389,7 +394,6 @@
                                             </label>
                                         </div>
                                     </div>
-
                                     <div class="text-center mt-3">
                                         <button type="submit" class="btn btn-primary">Start New Round</button>
                                     </div>
