@@ -7,7 +7,8 @@ from app.services.admin_service import (
     verify_admin_password, get_admin_dashboard_data, accept_team,
     change_game_state, start_round, set_round_schedule,
     toggle_team_state, toggle_player_state, force_vote_decision,
-    backup_database, execute_db_command, wipe_game, update_voting_threshold
+    backup_database, execute_db_command, wipe_game, update_voting_threshold,
+    toggle_voting_status
 )
 from app.services.email_service import send_team_approval_notification
 
@@ -96,6 +97,9 @@ def dashboard():
     """
     Admin dashboard with game overview and controls.
     """
+    # get game state
+    game_state = GameState.query.first()
+
     # Get dashboard data
     dashboard_data = get_admin_dashboard_data()
 
@@ -122,6 +126,7 @@ def dashboard():
         all_players=all_players,
         pending_confirmations=pending_confirmations,
         active_tab=active_tab,
+        game_state=game_state,
         now=datetime.now()
     )
 
@@ -427,3 +432,18 @@ def view_kill_admin(kill_confirmation_id):
         current_app.logger.error(f"Error viewing kill: {str(e)}")
         flash(f"Error loading kill confirmation: {str(e)}", "danger")
         return redirect(url_for('admin.dashboard'))
+
+
+@admin.route('/toggle-voting')
+@admin_required
+def toggle_voting():
+    """Enable or disable the voting feature for users."""
+    success, new_status = toggle_voting_status()
+
+    if success:
+        status_text = "enabled" if new_status else "disabled"
+        flash(f'Voting has been {status_text} successfully!', 'success')
+    else:
+        flash('Failed to toggle voting status.', 'danger')
+
+    return redirect_with_tab('admin.dashboard')

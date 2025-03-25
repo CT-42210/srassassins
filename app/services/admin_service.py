@@ -628,3 +628,25 @@ def execute_db_command(sql_command):
         db.session.rollback()
         current_app.logger.error(f'SQL command failed: {str(e)}')
         return False, str(e)
+
+
+def toggle_voting_status():
+    """Toggle the voting feature on/off."""
+    try:
+        game_state = GameState.query.first()
+        game_state.voting_enabled = not game_state.voting_enabled
+        db.session.commit()
+
+        # Log the action
+        log = ActionLog(
+            action_type='voting_toggle',
+            description=f'Voting has been {"enabled" if game_state.voting_enabled else "disabled"}',
+            actor='admin'
+        )
+        db.session.add(log)
+        db.session.commit()
+
+        return True, game_state.voting_enabled
+    except Exception as e:
+        current_app.logger.error(f"Failed to toggle voting status: {str(e)}")
+        return False, None

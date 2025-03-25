@@ -545,7 +545,16 @@
                         {% endif %}
                     </div>
                 </div>
-
+                <!-- Enable and Disable Voting -->
+                <div class="card mb-4">
+                    <div class="card-header">Voting System Control</div>
+                    <div class="card-body">
+                        <p>Current status: <strong>{{ "Enabled" if game_state.voting_enabled else "Disabled" }}</strong></p>
+                        <a href="{{ url_for('admin.toggle_voting') }}" class="btn btn-primary">
+                            {{ "Disable" if game_state.voting_enabled else "Enable" }} Voting
+                        </a>
+                    </div>
+                </div>
                 <!-- View and analyze past confirmations -->
                 <div class="card admin-card mt-4">
                     <div class="card-header">

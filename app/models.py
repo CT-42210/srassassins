@@ -150,6 +150,7 @@ class GameState(db.Model):
     state = db.Column(db.String(20), default='pre')  # pre, live, post, forced
     round_number = db.Column(db.Integer, default=0)
     voting_threshold = db.Column(db.Integer, default=3)
+    voting_enabled = db.Column(db.Boolean, default=True)
     round_start = db.Column(db.DateTime, nullable=True)
     round_end = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -1,6 +1,7 @@
 import uuid
 import os
 from datetime import datetime
+from functools import wraps
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
@@ -12,7 +13,6 @@ from app.services.game_service import submit_kill as service_submit_kill
 from app.services.media_service import process_video
 from app.services.instagram_service import send_ellie_video, send_ellie_image
 
-
 game = Blueprint('game', __name__)
 
 
@@ -20,6 +20,17 @@ def allowed_file(filename):
     """Check if the file has an allowed extension."""
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+
+
+def voting_enabled_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        game_state = GameState.query.first()
+        if not game_state or not game_state.voting_enabled:
+            flash('Voting is currently disabled.', 'warning')
+            return redirect(url_for('main.index'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @game.route('/home')
@@ -200,6 +211,7 @@ def submit_kill_route():
 
 @game.route('/voting')
 @login_required
+@voting_enabled_required
 def voting():
     """
     Display kill confirmations that need votes.
@@ -224,6 +236,7 @@ def voting():
 
 @game.route('/view-video/<kill_confirmation_id>')
 @login_required
+@voting_enabled_required
 def view_video(kill_confirmation_id):
     """
     View a kill confirmation video.
@@ -262,6 +275,7 @@ def view_video(kill_confirmation_id):
 
 @game.route('/vote/<kill_confirmation_id>/<vote_value>')
 @login_required
+@voting_enabled_required
 def vote(kill_confirmation_id, vote_value):
     """
     Submit a vote for a kill confirmation.
