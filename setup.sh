@@ -8,7 +8,7 @@
 set -e
 
 # Display a status message
-echo "===== Setting up srassassins Flask Application ====="
+echo "===== Setting up Srassassins Flask Application ====="
 
 # Check if we're in the right directory
 if [ "$(pwd)" != "/var/www/srassassins" ]; then
@@ -43,15 +43,28 @@ flask db init
 flask db migrate
 flask db upgrade
 
-# Determine the correct Apache configuration directory for Alma OS
-if [ -d "/etc/httpd/conf.d" ]; then
+# Determine the correct Apache configuration directory for cPanel on Alma OS
+if [ -d "/usr/local/apache/conf/userdata/std/2_4/_/srassassins" ]; then
+    # cPanel with per-user vhosts configuration
+    APACHE_CONF_DIR="/usr/local/apache/conf/userdata/std/2_4/_/srassassins"
+    mkdir -p "$APACHE_CONF_DIR"
+elif [ -d "/usr/local/apache/conf/vhosts" ]; then
+    # cPanel with centralized vhosts configuration
+    APACHE_CONF_DIR="/usr/local/apache/conf/vhosts"
+elif [ -d "/etc/httpd/conf.d" ]; then
+    # Standard Alma OS location
     APACHE_CONF_DIR="/etc/httpd/conf.d"
 elif [ -d "/etc/apache2/conf.d" ]; then
+    # Alternative location
     APACHE_CONF_DIR="/etc/apache2/conf.d"
 else
-    echo "Warning: Could not find Apache configuration directory. Using /etc/httpd/conf.d"
-    APACHE_CONF_DIR="/etc/httpd/conf.d"
+    # Fallback to a common location and ensure it exists
+    echo "Warning: Could not find standard Apache configuration directory."
+    APACHE_CONF_DIR="/usr/local/apache/conf.d"
+    mkdir -p "$APACHE_CONF_DIR"
 fi
+
+echo "Using Apache configuration directory: $APACHE_CONF_DIR"
 
 # Copy service file instead of creating it
 echo "Copying systemd service file..."
@@ -71,21 +84,39 @@ else
     exit 1
 fi
 
-# Enable Apache proxy modules
-echo "Enabling Apache proxy modules..."
-if command -v a2enmod &> /dev/null; then
-    # Debian-based command
-    a2enmod proxy
-    a2enmod proxy_http
+# Enable Apache proxy modules for cPanel
+echo "Enabling Apache proxy modules for cPanel..."
+
+# Determine Apache config locations for cPanel
+if [ -d "/usr/local/apache/conf" ]; then
+    APACHE_CONF_DIR="/usr/local/apache/conf"
+    APACHE_MODULES_FILE="${APACHE_CONF_DIR}/includes/pre_main_global.conf"
+elif [ -d "/etc/apache2" ]; then
+    APACHE_CONF_DIR="/etc/apache2"
+    APACHE_MODULES_FILE="${APACHE_CONF_DIR}/conf.d/includes.conf"
 else
-    # For RHEL/CentOS/Alma Linux, modules are enabled by default if installed
-    # Ensure modules are loaded
-    if ! grep -q "mod_proxy.so" /etc/httpd/conf.modules.d/*.conf; then
-        echo "LoadModule proxy_module modules/mod_proxy.so" >> /etc/httpd/conf.modules.d/00-proxy.conf
+    APACHE_CONF_DIR="/etc/httpd"
+    APACHE_MODULES_FILE="${APACHE_CONF_DIR}/conf/includes/pre_main_global.conf"
+fi
+
+# Create directory if it doesn't exist
+mkdir -p "$(dirname "$APACHE_MODULES_FILE")"
+
+# Check if proxy modules are already enabled
+if [ -f "$APACHE_MODULES_FILE" ]; then
+    if ! grep -q "mod_proxy.so\|proxy_module" "$APACHE_MODULES_FILE"; then
+        echo "# Added by srassassins setup script" >> "$APACHE_MODULES_FILE"
+        echo "LoadModule proxy_module modules/mod_proxy.so" >> "$APACHE_MODULES_FILE"
+        echo "LoadModule proxy_http_module modules/mod_proxy_http.so" >> "$APACHE_MODULES_FILE"
+        echo "Proxy modules added to $APACHE_MODULES_FILE"
+    else
+        echo "Proxy modules already enabled in $APACHE_MODULES_FILE"
     fi
-    if ! grep -q "mod_proxy_http.so" /etc/httpd/conf.modules.d/*.conf; then
-        echo "LoadModule proxy_http_module modules/mod_proxy_http.so" >> /etc/httpd/conf.modules.d/00-proxy.conf
-    fi
+else
+    echo "# Added by srassassins setup script" > "$APACHE_MODULES_FILE"
+    echo "LoadModule proxy_module modules/mod_proxy.so" >> "$APACHE_MODULES_FILE"
+    echo "LoadModule proxy_http_module modules/mod_proxy_http.so" >> "$APACHE_MODULES_FILE"
+    echo "Created $APACHE_MODULES_FILE with proxy modules"
 fi
 
 # Enable and start the Gunicorn service
@@ -94,14 +125,22 @@ systemctl daemon-reload
 systemctl enable srassassins.service
 systemctl start srassassins.service
 
-# Restart Apache
+# Restart Apache (cPanel method)
 echo "Restarting Apache..."
-if systemctl is-active --quiet httpd; then
+if [ -f "/scripts/restartsrv_apache" ]; then
+    # cPanel restart script
+    /scripts/restartsrv_apache
+elif [ -f "/usr/local/cpanel/scripts/restartsrv_httpd" ]; then
+    # Alternative cPanel restart script
+    /usr/local/cpanel/scripts/restartsrv_httpd
+elif systemctl is-active --quiet httpd; then
+    # Standard systemd service name
     systemctl restart httpd
 elif systemctl is-active --quiet apache2; then
+    # Alternative systemd service name
     systemctl restart apache2
 else
-    echo "Warning: Could not determine Apache service name. Please restart Apache manually."
+    echo "Warning: Could not determine Apache service name. Please restart Apache manually with: /scripts/restartsrv_httpd"
 fi
 
 # Provide status information
