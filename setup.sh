@@ -2,7 +2,7 @@
 
 # Srassassins Flask Application Deployment Script
 # This script should be run from /var/www/srassassins
-# Assumes the git repository has already been cloned to this location
+# Handles both new installations and re-runs by overwriting existing files
 
 # Exit on any error
 set -e
@@ -22,9 +22,25 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Create and activate virtual environment
-echo "Creating Python virtual environment..."
-python3 -m venv venv
+# Force flag for overwriting existing virtual environment
+FORCE_REINSTALL=true
+
+# Handle existing virtual environment
+if [ -d "venv" ]; then
+    if [ "$FORCE_REINSTALL" = true ]; then
+        echo "Removing existing virtual environment..."
+        rm -rf venv
+        echo "Creating new Python virtual environment..."
+        python3 -m venv venv
+    else
+        echo "Using existing virtual environment..."
+    fi
+else
+    echo "Creating Python virtual environment..."
+    python3 -m venv venv
+fi
+
+# Activate virtual environment
 source venv/bin/activate
 
 # Install required packages from requirements.txt
@@ -37,8 +53,8 @@ else
     exit 1
 fi
 
-# initialize database
-echo "Initializing database"
+# Initialize database
+echo "Initialize Database"
 flask db init
 flask db migrate
 flask db upgrade
@@ -66,10 +82,17 @@ fi
 
 echo "Using Apache configuration directory: $APACHE_CONF_DIR"
 
+# Stop existing service if running
+if systemctl is-active --quiet srassassins.service; then
+    echo "Stopping existing srassassins service..."
+    systemctl stop srassassins.service
+fi
+
 # Copy service file instead of creating it
 echo "Copying systemd service file..."
 if [ -f "/var/www/srassassins/srassassins.service" ]; then
-    cp "/var/www/srassassins/srassassins.service" "/etc/systemd/system/srassassins.service"
+    cp -f "/var/www/srassassins/srassassins.service" "/etc/systemd/system/srassassins.service"
+    echo "Service file copied to /etc/systemd/system/srassassins.service"
 else
     echo "Error: srassassins.service file not found in the repository!"
     exit 1
@@ -78,7 +101,8 @@ fi
 # Copy Apache configuration file instead of creating it
 echo "Copying Apache configuration file..."
 if [ -f "/var/www/srassassins/srassassins.conf" ]; then
-    cp "/var/www/srassassins/srassassins.conf" "${APACHE_CONF_DIR}/srassassins.conf"
+    cp -f "/var/www/srassassins/srassassins.conf" "${APACHE_CONF_DIR}/srassassins.conf"
+    echo "Apache configuration copied to ${APACHE_CONF_DIR}/srassassins.conf"
 else
     echo "Error: srassassins.conf file not found in the repository!"
     exit 1
@@ -123,7 +147,7 @@ fi
 echo "Starting Gunicorn service..."
 systemctl daemon-reload
 systemctl enable srassassins.service
-systemctl start srassassins.service
+systemctl restart srassassins.service  # Use restart instead of start to handle re-runs
 
 # Restart Apache (cPanel method)
 echo "Restarting Apache..."
@@ -156,6 +180,6 @@ echo "2. Check firewall settings if necessary"
 echo ""
 echo "To troubleshoot:"
 echo "- Gunicorn logs: journalctl -u srassassins.service"
-echo "- Apache logs: /var/log/httpd/srassassins-error.log"
+echo "- Apache logs: check cPanel logs or /var/log/httpd/srassassins-error.log"
 echo ""
 echo "You can access your application at your domain or via http://your-server-ip"
