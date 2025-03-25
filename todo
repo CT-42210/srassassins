@@ -1,6 +1,6 @@
 - make sure mov can be uploaded
 - image on signup for ellie
 
-- make voting feature modular
+- make sure ellie gets sent the team targets
 
 - flask to wsgi https://www.youtube.com/watch?v=w0QDAg85Oow
