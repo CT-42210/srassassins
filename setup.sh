@@ -53,9 +53,25 @@ else
     exit 1
 fi
 
-# Initialize database
+# Initialize database with handling for existing migrations
 echo "Initialize Database"
-flask db init
+if [ -d "migrations" ]; then
+    # If migrations directory exists and we're forcing reinstall, remove it
+    if [ "$FORCE_REINSTALL" = true ]; then
+        echo "Removing existing migrations directory..."
+        rm -rf migrations
+        echo "Initializing fresh database migration..."
+        flask db init
+    else
+        echo "Migrations directory already exists, skipping initialization..."
+    fi
+else
+    echo "Initializing database migration..."
+    flask db init
+fi
+
+# Always run migrate and upgrade
+echo "Running database migrations..."
 flask db migrate
 flask db upgrade
 
