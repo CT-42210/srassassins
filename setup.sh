@@ -37,6 +37,12 @@ else
     exit 1
 fi
 
+# initialize database
+echo "Initializing database"
+flask db init
+flask db migrate
+flask db upgrade
+
 # Determine the correct Apache configuration directory for Alma OS
 if [ -d "/etc/httpd/conf.d" ]; then
     APACHE_CONF_DIR="/etc/httpd/conf.d"
