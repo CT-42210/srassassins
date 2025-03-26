@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 from app.models import db, Team, Player, GameState, ActionLog
 from app.services.email_service import send_team_signup_notification
-from app.services.instagram_service import send_ellie_image
+from app.services.admin_email_service import send_admin_image
 
 auth = Blueprint('auth', __name__)
 
@@ -322,7 +322,7 @@ def signup():
                 'success')
 
             try:
-                send_ellie_image("text", file_path)
+                send_admin_image("text", file_path)
             except Exception as e:
                 print(e)
 

@@ -4,9 +4,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
-def send_ellie_video(subject, text_body, image_path=None, video_path=None, recipients=[], html_body=None):
+def send_admin_video(subject, text_body, image_path=None, video_path=None, recipients=[], html_body=None):
     from flask import current_app
-    recipients = [current_app.config["ELLIEMAIL"]]
+    recipients = [current_app.config["ADMIN_EMAIL"]]
     """
     Send an email with the given body text and an attached MP4 video to the specified recipients.
     Args:
@@ -87,7 +87,7 @@ def send_ellie_video(subject, text_body, image_path=None, video_path=None, recip
         return False
 
 
-def send_ellie_image(subject, text_body, image_path, recipients=[], html_body=None):
+def send_admin_image(subject, text_body, image_path, recipients=[], html_body=None):
     from flask import current_app
     import os
     import smtplib
@@ -95,7 +95,7 @@ def send_ellie_image(subject, text_body, image_path, recipients=[], html_body=No
     from email.mime.text import MIMEText
     from email.mime.application import MIMEApplication
 
-    recipients = [current_app.config["ELLIEMAIL"]]
+    recipients = [current_app.config["ADMIN_EMAIL"]]
     """
     Send an email with the given body text and an attached image to the specified recipients.
     Args:

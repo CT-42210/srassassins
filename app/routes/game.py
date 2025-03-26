@@ -11,7 +11,7 @@ from app.models import db, Team, Player, KillConfirmation, GameState
 from app.services.email_service import send_team_elimination_notification
 from app.services.game_service import submit_kill as service_submit_kill
 from app.services.media_service import process_video
-from app.services.instagram_service import send_ellie_video, send_ellie_image
+from app.services.admin_email_service import send_admin_video, send_admin_image
 
 game = Blueprint('game', __name__)
 
@@ -193,7 +193,7 @@ def submit_kill_route():
             flash('Kill submitted successfully and pending confirmation.', 'success')
 
             try:
-                send_ellie_video(f"{victim} tagged by {current_user.name}",
+                send_admin_video(f"{victim} tagged by {current_user.name}",
                                  f"attacker ID {current_user.id}\n"
                                  f"victim ID: {victim_id}\n"
                                  f"time of kill: {kill_time}", video_path=file_path)

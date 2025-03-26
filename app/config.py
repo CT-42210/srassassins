@@ -26,7 +26,7 @@ class Config:
 
     # Instagram configuration
     INSTAGRAM_USERNAME = os.environ.get('INSTAGRAM_USERNAME')
-    ELLIEMAIL = os.environ.get('ELLIEEMAIL')
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
     
     # Backup configuration
     BACKUP_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backups')
