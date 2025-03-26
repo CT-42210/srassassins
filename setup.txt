@@ -1,8 +1,15 @@
 sudo apt update && sudo apt upgrade -y
 
+sudo apt install python3-venv
+
 
 
 sudo rm /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/srassassins.conf /etc/nginx/sites-enabled/default
 
+sudo systemctl enable srassassins.service
+
+
+sudo ufw enable
 sudo ufw allow 80/tcp
+sudo ufw allow 5000/tcp

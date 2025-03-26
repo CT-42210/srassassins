@@ -10,17 +10,16 @@
             
             <div class="card">
                 <div class="card-body">
-                    <h2>Game Overview</h2>
-                    <p>Senior Assassin is a game of stealth, strategy, and survival. Each team is assigned another team as their target. The goal is to "eliminate" all members of your target team using water-based weapons. The last team standing wins.</p>
+                    <h2>Overview</h2>
+                    <p>The rules below were drafted from three primary sources: the results of the Google form, rules from previous iterations of the game, and input from the SGA, Nick, and Johannes. If you have concerns, feel free to reach out.</p>
                     
                     <hr>
                     
                     <h2>Teams</h2>
                     <ul>
                         <li>Teams can consist of either one or two players.</li>
-                        <li>All team members must be seniors at our high school.</li>
                         <li>Once teams are formed, they cannot be changed.</li>
-                        <li>Each team must have a team name and photo for identification.</li>
+                        <li>Each team must sign up with a team name and photo.</li>
                     </ul>
                     
                     <hr>
@@ -28,29 +27,35 @@
                     <h2>Game Rounds</h2>
                     <ul>
                         <li>The game is divided into multiple rounds.</li>
+                        <li>Round start and end time/dates, along with how many rounds will be played, will be announced before.</li>
                         <li>At the beginning of each round, teams are assigned a new target.</li>
-                        <li>Rounds have a specific start and end time, which will be announced.</li>
-                        <li>If a team is eliminated but their team has at least one surviving player, they will be revived at the start of the next round.</li>
+                        <li>At the end of each round, if a team has eliminated their targets and has at least one member alive, they will continue on to the next round. Any eliminated team members will be revived for the next round.</li>
+                        <li>At the end of each round, if a team fails to eliminate their targets, they are eliminated.</li>
                     </ul>
                     
                     <hr>
                     
                     <h2>Elimination Rules</h2>
                     <ol>
-                        <li><strong>Permitted weapons:</strong> Water guns, water balloons, and other water-based tools.</li>
-                        <li><strong>To eliminate a player:</strong> You must hit them with water and say "You've been eliminated" or similar phrase.</li>
-                        <li><strong>Video proof:</strong> All eliminations must be recorded on video as proof.</li>
-                        <li><strong>Safe zones:</strong>
+                        <li><strong>Permitted weapons:</strong> Only water guns are allowed.</li>
+                        <li><strong>To eliminate a player, you must be:</strong>
                             <ul>
-                                <li>School property during school hours</li>
-                                <li>Places of employment during work hours</li>
-                                <li>Inside vehicles</li>
-                                <li>Bathrooms</li>
-                                <li>Religious services</li>
-                                <li>School-sponsored events</li>
+                                <li>On your feet ( standing, sitting, or lying down--no cars, bikes, scooters, or other vehicles).</li>
+                                <li>In open air (meaning not indoors)(excluding houses, see section below).</li>
+                                <li>Not in a Safe Zone.</li>
+                                <li>In compliance with all other rules.</li>
                             </ul>
                         </li>
-                        <li><strong>Team elimination:</strong> A team is eliminated when all its members have been eliminated.</li>
+                        <li><strong>Video proof:</strong> All eliminations must be recorded on video and uploaded to the portal for vote. Only videos will be accepted.</li>
+                        <li><strong>Safe zones:</strong>
+                            <ul>
+                                <li>All MBS Property (excluding the parking lot, see below).</li>
+                                <li>Any other school's property.</li>
+                                <li>MBS Parking lot from 7:45am to 3:30pm. Only including the pavement. (The stairs, grass, and road are not considered the parking lot.)</li>
+                                <li>The location of any competitive sport practice or competition (see sports section).</li>
+                                <li>The location of any work shift (see work section).</li>
+                            </ul>
+                        </li>
                     </ol>
                     
                     <hr>
@@ -61,40 +66,99 @@
                         <li>The submission must include a video of the elimination.</li>
                         <li>Other players in the game will vote to confirm or reject the elimination.</li>
                         <li>A minimum of {{ game_state.voting_threshold }} votes is required to confirm or reject the elimination.</li>
-                        <li>Invalid eliminations (e.g., in safe zones, using non-approved weapons) will be rejected.</li>
+                        <li>Eliminations in blatant violation of the rules (such as in safe zones) will be rejected. Otherwise, it will be up to the players of the game to decide if a kill counts.</li>
                     </ol>
                     
                     <hr>
                     
-                    <h2>Safety Guidelines</h2>
+                    <h2>Sports</h2>
                     <ol>
-                        <li>Never trespass on private property.</li>
-                        <li>Never engage in dangerous behavior (e.g., chasing in traffic, climbing buildings).</li>
-                        <li>Water weapons should not be visible in public places where they might cause alarm.</li>
-                        <li>No eliminations while driving or that would distract a driver.</li>
-                        <li>Be respectful of bystanders and public spaces.</li>
+                        <li>Players are considered "immune" during any competitive sport practice or competition, or work shift.</li>
+                        <li>A competitive sport is defined by a sport with:
+                            <ul>
+                                <li>A dedicated team.</li>
+                                <li>A paid coach.</li>
+                                <li>Formal Competitions</li>
+                            </ul>
+                        </li>
+                        <li>Once the player leaves their locker room (or location of practice/competition if there is no locker room), the player must start a stopwatch on their phone.</li>
+                        <li>The player has 5 minutes of immunity to leave the location.</li>
+                        <li>If the timer has been started properly, all kill confirmations against the player while the timer reads under 5 minutes will be rejected.</li>
+                        <li>If an attacker can prove that the player failed to start the timer properly, the kill confirmation will go on to public vote.</li>
                     </ol>
                     
                     <hr>
-                    
-                    <h2>Sportsmanship</h2>
+
+                    <h2>Work</h2>
                     <ol>
-                        <li>Be honest about eliminations.</li>
-                        <li>Accept eliminations gracefully.</li>
-                        <li>Vote fairly on kill confirmations.</li>
-                        <li>No harassment or intimidation of other players.</li>
-                        <li>No destruction of property or disruptive behavior.</li>
+                        <li>Players are considered "immune" during any work shift.</li>
+                        <li>Work is defined by any of the below:
+                            <ul>
+                                <li>A contracted job (employment).</li>
+                                <li>Obligatory volunteer work.</li>
+                            </ul>
+                        </li>
+                        <li>The player is immune in their commute into their work.</li>
+                        <li>Once the shift ends, the player is immediately vulnerable with no grace period.</li>
                     </ol>
-                    
+
                     <hr>
-                    
-                    <h2>Winning the Game</h2>
-                    <p>The last team standing wins the game and will receive recognition and bragging rights!</p>
-                    
+
+                    <h2>Houses and Functions</h2>
+                    <ol>
+                        <li>Houses are an exception to the no indoors rule.</li>
+                        <li>If an attacker is invited into the targets home <strong>by the target themselves,</strong> then all tags are valid.</li>
+                        <li>If an attacker is invited into another player's home, and their attacker is also invited, all tags are also valid.</li>
+                        <Li>If a function happening inside a player's home has more than 15 other players (meaning people who are signed up in Crimsassions) then all kills are invalid.</Li>
+                    </ol>
+
                     <hr>
-                    
-                    <h2>Admin Decisions</h2>
-                    <p>The game administrators have final say on all disputes. Administrators may remove players from the game for rule violations or unsportsmanlike conduct.</p>
+
+                    <h2>Cars</h2>
+                    <ol>
+                        <li>You cannot tag a player while in any car seat (front or back, driving or passenger).</li>
+                        <li>You can tag a player from the trunk of the car, only as long as the car is not being operated (meaning the driver's seat is empty).</li>
+                        <Li>You can be tagged while sitting inside a car through an open door, so long as the attacker is in compliance with the above.</Li>
+                    </ol>
+
+                    <hr>
+
+                    <h2>Stalking/Following/Tracking</h2>
+                    <ol>
+                        <li>All players are subject to the repercussions of their actions as they pursue their targets.</li>
+                        <li>Do not drive recklessly while following a target.</li>
+                        <li>When staking out and waiting for your target (such as in a bush), please keep in mind how your presence and actions will be interpreted by non-players.</li>
+                        <Li>Tracking devices of any kind (Air Tags, Tiles, or anything else) are not allowed.</Li>
+                    </ol>
+
+                    <hr>
+
+                    <h2>Other Safety Guidelines</h2>
+                    <ol>
+                        <li><strong>USE YOUR HEAD.</strong> Don't do stupid stuff.</li>
+                        <li>Never engage in dangerous or illegal behavior. You are liable to your own repercussions of your actions.</li>
+                        <li>Weapons should not be visible in public places where they might cause alarm.</li>
+                        <li>Weapons should not resemble firearms, or any other legitimate weapons.</li>
+                        <li>Be respectful of other people.</li>
+                        <li>If the school approaches you with questions about the game, deny involvement.</li>
+                    </ol>
+
+                    <hr>
+
+                    <h2>Breaking Rules</h2>
+                    <ol>
+                        <li>Players who break rules are given one offence.</li>
+                        <li>After the first offence, a player's team will be disqualified from the game.</li>
+                    </ol>
+
+                    <hr>
+
+                    <h2>Money</h2>
+                    <ol>
+                        <li>Buy in for the game is $25 a player.</li>
+                        <li>1st place prize is $1,000.</li>
+                        <Li>2nd through 5th place teams will be returned their entry fee.</Li>
+                    </ol>
                 </div>
             </div>
             
