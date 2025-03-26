@@ -1,0 +1,14 @@
+[Unit]
+Description=Python Application Service
+After=network.target
+
+[Service]
+User=srassassins25
+WorkingDirectory=~/srassassins
+ExecStart=/bin/bash -c 'source ~/srassassins/venv/bin/activate && python ~/srassassins/run.py'
+Restart=on-failure
+RestartSec=5
+
+
+[Install]
+WantedBy=multi-user.target

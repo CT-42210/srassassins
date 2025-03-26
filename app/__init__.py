@@ -35,7 +35,7 @@ def create_app(config_name='default'):
     
     # Only enable HTTPS in production
     if config_name == 'production':
-        talisman.init_app(app, force_https=False, content_security_policy=None)
+        talisman.init_app(app, content_security_policy=None)
     
     migrate.init_app(app, db)
     
