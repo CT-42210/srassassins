@@ -3,9 +3,9 @@ Description=Python Application Service
 After=network.target
 
 [Service]
-User=srassassins25
-WorkingDirectory=~/srassassins
-ExecStart=/bin/bash -c 'source ~/srassassins/venv/bin/activate && python ~/srassassins/run.py'
+User=username
+WorkingDirectory=/home/username/srassassins
+ExecStart=/bin/bash -c 'source /home/username/srassassins/venv/bin/activate && python /home/username/>
 Restart=on-failure
 RestartSec=5
 
