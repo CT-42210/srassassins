@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=username
 WorkingDirectory=/home/username/srassassins
-ExecStart=/bin/bash -c 'source /home/username/srassassins/venv/bin/activate && python /home/username/>
+ExecStart=/bin/bash -c 'source /home/username/srassassins/venv/bin/activate && python /home/username/srassassins/run.py'
 Restart=on-failure
 RestartSec=5
 
