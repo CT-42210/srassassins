@@ -53,24 +53,13 @@
 <body>
     <div class="header">
         <h1>Team Approved!</h1>
-        <h2>{{ team.name }} is now active in Senior Assassin</h2>
+        <h2>{{ team.name }} is now active in Crimsassions</h2>
     </div>
 
     <div class="content">
-        <p>Congratulations! Your team <strong>{{ team.name }}</strong> has been approved and is now active in the Senior Assassin game.</p>
+        <p>Congratulations! Your team <strong>{{ team.name }}</strong> has been approved and is now active in Crimsassions.</p>
 
-        <p>Log in to the game portal to see your first target assignment and begin your hunt!</p>
-
-        <div class="rules-box">
-            <h3 style="margin-top: 0;">Key Rules Reminder:</h3>
-            <ul>
-                <li><strong>Approved weapons:</strong> Water guns, water balloons, and other water-based weapons only</li>
-                <li><strong>Safe zones:</strong> Classrooms during school hours, workplaces, and religious activities</li>
-                <li><strong>Evidence:</strong> All eliminations must be recorded on video</li>
-                <li><strong>Time limit:</strong> You have 48 hours to eliminate your target</li>
-                <li><strong>Confirmation:</strong> All eliminations require community voting to confirm</li>
-            </ul>
-        </div>
+        <p>When the game starts, log in to the game portal to see your first target assignment and begin your hunt!</p>
 
         <p>Remember to check your email regularly for game updates, new rounds, and voting requests.</p>
 
@@ -81,9 +70,6 @@
             {% endfor %}
         </ul>
 
-        <div style="text-align: center;">
-            <a href="{{ url_for('auth.login', _external=True) }}" class="button">Log in to Game Portal</a>
-        </div>
 
         <p style="margin-top: 20px;">Good luck, and may the odds be ever in your favor!</p>
     </div>
