@@ -68,7 +68,7 @@ def login():
         else:
             flash('Invalid email or password.', 'danger')
 
-    return render_template('auth/login.html', now=datetime.now())
+    return render_template('auth/login.html', game_state=game_state, now=datetime.now())
 
 
 @auth.route('/logout')
@@ -116,7 +116,7 @@ def signup():
             else:
                 flash('You must acknowledge the rules to continue.', 'danger')
 
-        return render_template('signup/step1.html', now=datetime.now())
+        return render_template('signup/step1.html', game_state=game_state, now=datetime.now())
 
     elif step == 2:
         # Step 2: Enter team name and number of players
@@ -127,16 +127,16 @@ def signup():
             # Validate inputs
             if not team_name:
                 flash('Please enter a team name.', 'danger')
-                return render_template('signup/step2.html', now=datetime.now())
+                return render_template('signup/step2.html', game_state=game_state, now=datetime.now())
 
             if player_count not in [1, 2]:
                 flash('Player count must be 1 or 2.', 'danger')
-                return render_template('signup/step2.html', now=datetime.now())
+                return render_template('signup/step2.html', game_state=game_state, now=datetime.now())
 
             # Check if team name is already taken
             if Team.query.filter_by(name=team_name).first():
                 flash('Team name is already taken.', 'danger')
-                return render_template('signup/step2.html', now=datetime.now())
+                return render_template('signup/step2.html', game_state=game_state, now=datetime.now())
 
             # Store data in session
             session['team_name'] = team_name
@@ -146,7 +146,7 @@ def signup():
             session['signup_step'] = 3
             return redirect(url_for('auth.signup'))
 
-        return render_template('signup/step2.html', now=datetime.now())
+        return render_template('signup/step2.html', game_state=game_state, now=datetime.now())
 
     elif step == 3:
         # Step 3: Enter player one information
@@ -161,16 +161,16 @@ def signup():
             # Validate inputs
             if not all([player_name, player_email, player_phone, player_address, player_password]):
                 flash('All fields are required.', 'danger')
-                return render_template('signup/step3.html', now=datetime.now())
+                return render_template('signup/step3.html', game_state=game_state, now=datetime.now())
 
             if player_password != player_password_confirm:
                 flash('Passwords do not match.', 'danger')
-                return render_template('signup/step3.html', now=datetime.now())
+                return render_template('signup/step3.html', game_state=game_state, now=datetime.now())
 
             # Check if email is already registered
             if Player.query.filter_by(email=player_email).first():
                 flash('Email is already registered.', 'danger')
-                return render_template('signup/step3.html', now=datetime.now())
+                return render_template('signup/step3.html', game_state=game_state, now=datetime.now())
 
             # Store data in session
             session['player1_name'] = player_name
@@ -187,7 +187,7 @@ def signup():
 
             return redirect(url_for('auth.signup'))
 
-        return render_template('signup/step3.html', now=datetime.now())
+        return render_template('signup/step3.html', game_state=game_state, now=datetime.now())
 
     elif step == 4:
         # Step 4: Enter player two information
@@ -202,21 +202,21 @@ def signup():
             # Validate inputs
             if not all([player_name, player_email, player_phone, player_address, player_password]):
                 flash('All fields are required.', 'danger')
-                return render_template('signup/step4.html', now=datetime.now())
+                return render_template('signup/step4.html', game_state=game_state, now=datetime.now())
 
             if player_password != player_password_confirm:
                 flash('Passwords do not match.', 'danger')
-                return render_template('signup/step4.html', now=datetime.now())
+                return render_template('signup/step4.html', game_state=game_state, now=datetime.now())
 
             # Check if email is already registered
             if Player.query.filter_by(email=player_email).first():
                 flash('Email is already registered.', 'danger')
-                return render_template('signup/step4.html', now=datetime.now())
+                return render_template('signup/step4.html', game_state=game_state, now=datetime.now())
 
             # Check if email is different from player one
             if player_email == session.get('player1_email'):
                 flash('Player two must have a different email.', 'danger')
-                return render_template('signup/step4.html', now=datetime.now())
+                return render_template('signup/step4.html', game_state=game_state, now=datetime.now())
 
             # Store data in session
             session['player2_name'] = player_name
@@ -230,7 +230,7 @@ def signup():
             return redirect(url_for('auth.signup'))
 
 
-        return render_template('signup/step4.html', now=datetime.now())
+        return render_template('signup/step4.html', game_state=game_state, now=datetime.now())
 
     elif step == 5:
         # Step 5: Upload team photo and complete registration
@@ -238,19 +238,19 @@ def signup():
             # Check if a file was uploaded
             if 'team_photo' not in request.files:
                 flash('No file selected.', 'danger')
-                return render_template('signup/step5.html', now=datetime.now())
+                return render_template('signup/step5.html', game_state=game_state, now=datetime.now())
 
             file = request.files['team_photo']
 
             # Check if file is empty
             if file.filename == '':
                 flash('No file selected.', 'danger')
-                return render_template('signup/step5.html', now=datetime.now())
+                return render_template('signup/step5.html', game_state=game_state, now=datetime.now())
 
             # Check if file has allowed extension
             if not allowed_file(file.filename):
                 flash('Invalid file type. Allowed types: png, jpg, jpeg, gif.', 'danger')
-                return render_template('signup/step5.html', now=datetime.now())
+                return render_template('signup/step5.html', game_state=game_state, now=datetime.now())
 
             # Save the file
             filename = secure_filename(file.filename)
@@ -328,7 +328,7 @@ def signup():
 
             return redirect(url_for('main.index'))
 
-        return render_template('signup/step5.html', now=datetime.now())
+        return render_template('signup/step5.html', game_state=game_state, now=datetime.now())
 
     # Invalid step, start over
     session['signup_step'] = 1

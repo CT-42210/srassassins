@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Crimsassions - About & Help{% endblock %}
+{% block title %}{{ game_state.game_name }} - About & Help{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -12,12 +12,12 @@
                 <div class="col-md-6">
                     <div class="card mb-4">
                         <div class="card-header bg-primary text-white">
-                            <h2 class="h4 mb-0">About Crimsassions</h2>
+                            <h2 class="h4 mb-0">About {{ game_state.game_name }}</h2>
                         </div>
                         <div class="card-body">
                             <p>Senior Assassin is a traditional game played by high school seniors around the country. It's a fun way to create lasting memories during your final year of high school.</p>
                             
-                            <p>Crimsassions is organized by students independent of any school. The game is designed to be safe, fair, and fun for all participants.</p>
+                            <p>{{ game_state.game_name }} is organized by students independent of any school. The game is designed to be safe, fair, and fun for all participants.</p>
                             
                             <p>Follow along with the game on Instagram: <a href="https://instagram.com/{{ config['INSTAGRAM_USERNAME'] }}" target="_blank">@{{ config['INSTAGRAM_USERNAME'] }}</a></p>
                         </div>

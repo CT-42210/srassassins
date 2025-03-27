@@ -51,10 +51,16 @@ def home():
     # Get target team and players if assigned
     target_team = None
     target_players = []
-    if team.target_id:
-        target_team = Team.query.get(team.target_id)
-        if target_team:
-            target_players = Player.query.filter_by(team_id=target_team.id).all()
+
+    if game_state.free_for_all:
+        # In free-for-all, all alive players except current user and partner are targets
+        target_players = Player.query.filter(Player.state == 'alive', Player.id != current_user.id, Player.id != teammate.id).all()
+    else:
+        # Regular team-based targeting
+        if team.target_id:
+            target_team = Team.query.get(team.target_id)
+            if target_team:
+                target_players = Player.query.filter_by(team_id=target_team.id).all()
 
     # Get counts of teams and players still alive
     alive_teams_count = Team.query.filter_by(state='alive').count()
@@ -102,10 +108,17 @@ def submit_kill_route():
     # Get target team and players if assigned
     target_team = None
     target_players = []
-    if team.target_id:
-        target_team = Team.query.get(team.target_id)
-        if target_team:
-            target_players = [p for p in Player.query.filter_by(team_id=target_team.id).all() if p.is_alive]
+
+    if game_state.free_for_all:
+        # In free-for-all, all alive players except current user are targets
+        teammate = Player.query.filter_by(team_id=team.id).filter(Player.id != current_user.id).first()
+        target_players = Player.query.filter(Player.state == 'alive', Player.id != current_user.id, Player.id != teammate.id).all()
+    else:
+        # Regular team-based targeting
+        if team.target_id:
+            target_team = Team.query.get(team.target_id)
+            if target_team:
+                target_players = [p for p in Player.query.filter_by(team_id=target_team.id).all() if p.is_alive]
 
     # If no targets, redirect back to home
     if not target_team or not target_players:
@@ -121,7 +134,7 @@ def submit_kill_route():
         if not victim_id or not kill_time_str or not rules_confirmation:
             flash('All fields are required.', 'danger')
             return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players,
-                                   now=datetime.now())
+                                   game_state=game_state, now=datetime.now())
 
         # Parse kill time
         try:
@@ -130,13 +143,13 @@ def submit_kill_route():
         except ValueError:
             flash('Invalid time format.', 'danger')
             return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players,
-                                   now=datetime.now())
+                                   game_state=game_state, now=datetime.now())
 
         # Check if a video was uploaded
         if 'kill_video' not in request.files:
             flash('No video uploaded.', 'danger')
             return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players,
-                                   now=datetime.now())
+                                   game_state=game_state, now=datetime.now())
 
         file = request.files['kill_video']
 
@@ -144,13 +157,13 @@ def submit_kill_route():
         if file.filename == '':
             flash('No video selected.', 'danger')
             return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players,
-                                   now=datetime.now())
+                                   game_state=game_state,now=datetime.now())
 
         # Check if file has allowed extension
         if not allowed_file(file.filename):
             flash('Invalid file type. Allowed types: mp4, mov.', 'danger')
             return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players,
-                                   now=datetime.now())
+                                   game_state=game_state, now=datetime.now())
 
         # Save the file
         filename = secure_filename(file.filename)
@@ -206,7 +219,7 @@ def submit_kill_route():
             return redirect(url_for('game.submit_kill_route'))
 
     return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players,
-                           now=datetime.now())
+                           game_state=game_state, now=datetime.now())
 
 
 @game.route('/voting')
@@ -231,6 +244,7 @@ def voting():
     return render_template('game/voting.html',
                            kill_confirmations=kill_confirmations,
                            Team=Team,
+                           game_state=game_state,
                            now=datetime.now())
 
 

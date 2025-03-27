@@ -53,11 +53,11 @@
 <body>
     <div class="header">
         <h1>Team Approved!</h1>
-        <h2>{{ team.name }} is now active in Crimsassions</h2>
+        <h2>{{ team.name }} is now active in {{ game_state.game_name }}</h2>
     </div>
 
     <div class="content">
-        <p>Congratulations! Your team <strong>{{ team.name }}</strong> has been approved and is now active in Crimsassions.</p>
+        <p>Congratulations! Your team <strong>{{ team.name }}</strong> has been approved and is now active in {{ game_state.game_name }}.</p>
 
         <p>When the game starts, log in to the game portal to see your first target assignment and begin your hunt!</p>
 

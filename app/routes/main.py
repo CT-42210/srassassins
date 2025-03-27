@@ -95,10 +95,13 @@ def leaderboard():
     # Get leaderboard data
     from app.services.game_service import get_leaderboard
     leaderboard_data = get_leaderboard()
-    
+
+    game_state = GameState.query.first()
+
     return render_template(
         'leaderboard.html',
         leaderboard=leaderboard_data,
+        game_state=game_state,
         now = datetime.now()
     )
 
@@ -107,4 +110,7 @@ def about():
     """
     Display information about the game and developer.
     """
-    return render_template('about.html', now=datetime.now())
+
+    game_state = GameState.query.first()
+
+    return render_template('about.html', game_state=game_state, now=datetime.now())

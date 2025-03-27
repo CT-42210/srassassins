@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 
 from flask import current_app, render_template
 
-from app.models import Player, Team
+from app.models import Player, Team, GameState
 
 
 def send_email(subject, recipients, text_body, html_body=None):
@@ -101,6 +101,8 @@ def send_team_email(team_id, subject, text_body, html_body=None):
 
 def send_new_round_notification(round_number):
     """Send a notification email about a new round starting."""
+    game_state = GameState.query.first()
+
     subject = f"Senior Assassin - Round {round_number} Started"
 
     text_body = f"""
@@ -113,7 +115,8 @@ def send_new_round_notification(round_number):
 
     html_body = render_template(
         'email/new_round_notification.html',
-        round_number=round_number
+        round_number=round_number,
+        game_state=game_state
     )
 
     # Only send to players who are still alive
@@ -127,6 +130,8 @@ def send_team_signup_notification(team_id):
     Args:
         team_id: ID of the team that signed up
     """
+    game_state = GameState.query.first()
+
     team = Team.query.get(team_id)
     if not team:
         return False
@@ -149,7 +154,8 @@ def send_team_signup_notification(team_id):
 
     html_body = render_template(
         'email/team_signup_notification.html',
-        team=team
+        team=team,
+        game_state=game_state
     )
 
     return send_team_email(team_id, subject, text_body, html_body)
@@ -162,6 +168,8 @@ def send_team_approval_notification(team_id):
     Args:
         team_id: ID of the team that was approved
     """
+    game_state = GameState.query.first()
+
     team = Team.query.get(team_id)
     if not team:
         return False
@@ -184,7 +192,7 @@ def send_team_approval_notification(team_id):
 
     html_body = render_template(
         'email/team_approval_notification.html',
-        team=team
+        team=team, game_state=game_state
     )
 
     return send_team_email(team_id, subject, text_body, html_body)
@@ -197,6 +205,8 @@ def send_team_elimination_notification(team_id):
     Args:
         team_id: ID of the team that was eliminated
     """
+    game_state = GameState.query.first()
+
     team = Team.query.get(team_id)
     if not team:
         return False
@@ -218,7 +228,7 @@ def send_team_elimination_notification(team_id):
 
     html_body = render_template(
         'email/team_elimination_notification.html',
-        team=team
+        team=team, game_state=game_state
     )
 
     return send_team_email(team_id, subject, text_body, html_body)
@@ -231,6 +241,8 @@ def send_kill_submission_notification(kill_confirmation):
     Args:
         kill_confirmation: KillConfirmation object
     """
+    game_state = GameState.query.first()
+
     subject = "Senior Assassin - New Kill Submission Requires Your Vote"
 
     # Get victim and attacker info
@@ -254,6 +266,7 @@ def send_kill_submission_notification(kill_confirmation):
 
     html_body = render_template(
         'email/kill_submission_notification.html',
+        game_state=game_state,
         victim=victim,
         attacker=attacker,
         victim_team=victim_team,

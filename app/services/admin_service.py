@@ -650,3 +650,85 @@ def toggle_voting_status():
     except Exception as e:
         current_app.logger.error(f"Failed to toggle voting status: {str(e)}")
         return False, None
+
+
+def toggle_free_for_all(enable):
+    """Toggle free-for-all mode and update target assignments."""
+    try:
+        # Get game state
+        game_state = GameState.query.first()
+        if not game_state:
+            return False
+
+        # Update free-for-all flag
+        old_state = game_state.free_for_all
+        game_state.free_for_all = enable
+
+        if enable:
+            # In free-for-all mode, we'll maintain existing targets for reference
+            # but the free_for_all flag will indicate that anyone can target anyone
+            alive_players = Player.query.filter_by(state='alive').all()
+            current_app.logger.info(f"Free-for-all mode enabled: {len(alive_players)} players can target anyone")
+
+            log = ActionLog(
+                action_type='free_for_all',
+                description=f'Free for all mode enabled - all {len(alive_players)} players can target anyone',
+                actor='admin'
+            )
+            db.session.add(log)
+        else:
+            # Reassign targets normally if disabling free-for-all
+            from app.services.game_service import assign_targets
+            assign_targets()
+
+            log = ActionLog(
+                action_type='free_for_all',
+                description='Free for all mode disabled - normal targeting restored',
+                actor='admin'
+            )
+            db.session.add(log)
+
+        db.session.commit()
+        return True
+    except Exception as e:
+        current_app.logger.error(f"Error toggling free-for-all mode: {str(e)}")
+        db.session.rollback()
+        return False
+
+def deny_team(team_id):
+    """
+    Deny a team's registration by deleting the team and its players.
+
+    Args:
+        team_id: The ID of the team to deny
+
+    Returns:
+        tuple: (success, team_name or error message)
+    """
+    team = Team.query.get(team_id)
+    if not team:
+        return False, "Team not found"
+
+    # Get team name before deletion for the message
+    team_name = team.name
+
+    try:
+        # First delete the associated players
+        Player.query.filter_by(team_id=team_id).delete()
+
+        # Then delete the team
+        db.session.delete(team)
+        db.session.commit()
+
+        # Log the action
+        log = ActionLog(
+            action_type='deny_team',
+            description=f'Deny team "{team_name}"',
+            actor='admin'
+        )
+        db.session.add(log)
+
+        return True, team_name
+    except Exception as e:
+        db.session.rollback()
+        return False, str(e)

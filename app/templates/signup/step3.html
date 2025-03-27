@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Crimsassions - Sign Up (Step 3){% endblock %}
+{% block title %}{{ game_state.game_name }} - Sign Up (Step 3){% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <h1 class="text-center mb-4">Sign Up for Crimsassions</h1>
+            <h1 class="text-center mb-4">Sign Up for {{ game_state.game_name }}</h1>
             
             <!-- Signup Progress Indicator -->
             <div class="signup-progress">

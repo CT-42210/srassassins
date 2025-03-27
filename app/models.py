@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import uuid
+import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -147,12 +148,14 @@ class GameState(db.Model):
     __tablename__ = 'game_state'
     
     id = db.Column(db.Integer, primary_key=True)
+    game_name = db.Column(db.String(128), nullable=False, default=os.environ.get('GAME_NAME'))
     state = db.Column(db.String(20), default='pre')  # pre, live, post, forced
     round_number = db.Column(db.Integer, default=0)
     voting_threshold = db.Column(db.Integer, default=3)
     voting_enabled = db.Column(db.Boolean, default=True)
     round_start = db.Column(db.DateTime, nullable=True)
     round_end = db.Column(db.DateTime, nullable=True)
+    free_for_all = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

@@ -4,11 +4,11 @@ from datetime import datetime
 
 from app.models import db, Team, Player, GameState, KillConfirmation, ActionLog
 from app.services.admin_service import (
-    verify_admin_password, get_admin_dashboard_data, accept_team,
+    verify_admin_password, get_admin_dashboard_data, accept_team, deny_team,
     change_game_state, start_round, set_round_schedule,
     toggle_team_state, toggle_player_state, force_vote_decision,
     backup_database, execute_db_command, wipe_game, update_voting_threshold,
-    toggle_voting_status
+    toggle_voting_status, toggle_free_for_all
 )
 from app.services.email_service import send_team_approval_notification
 
@@ -45,6 +45,8 @@ def login():
     """
     Handle admin login.
     """
+    game_state = GameState.query.first()
+
     if request.method == 'POST':
         password = request.form.get('password')
 
@@ -66,7 +68,7 @@ def login():
         else:
             flash('Invalid admin password.', 'danger')
 
-    return render_template('admin/login.html', now=datetime.now())
+    return render_template('admin/login.html', game_state=game_state, now=datetime.now())
 
 
 @admin.route('/logout')
@@ -341,6 +343,8 @@ def execute_sql():
     """
     sql_command = request.form.get('sql_command')
     confirmation = request.form.get('confirmation') == 'yes'
+    game_state = GameState.query.first()
+
 
     if not confirmation:
         flash('Please confirm the action by checking the confirmation box.', 'danger')
@@ -354,7 +358,7 @@ def execute_sql():
 
     if success:
         flash('SQL command executed successfully!', 'success')
-        return render_template('admin/sql_result.html', result=result, active_tab=get_active_tab())
+        return render_template('admin/sql_result.html', game_state=game_state, result=result, active_tab=get_active_tab())
     else:
         flash(f'SQL command failed: {result}', 'danger')
         return redirect_with_tab('admin.dashboard')
@@ -397,12 +401,6 @@ def send_mass_email():
                 current_app.logger.error(f"Failed to send email to {player.email}: {str(e)}")
 
     # Log the action
-    log = ActionLog(
-        action_type='mass_email',
-        description=f'Admin sent mass email "{subject}" to {success_count} players',
-        actor='admin'
-    )
-    db.session.add(log)
     db.session.commit()
 
     flash(f'Email sent successfully to {success_count} players!', 'success')
@@ -413,6 +411,7 @@ def send_mass_email():
 @admin_required
 def view_kill_admin(kill_confirmation_id):
     try:
+        game_state = GameState.query.first()
         # Get kill confirmation details
         kill = KillConfirmation.query.get_or_404(kill_confirmation_id)
         threshold = GameState.query.first().voting_threshold
@@ -426,6 +425,7 @@ def view_kill_admin(kill_confirmation_id):
             kill=kill,
             threshold=threshold,
             tab=request.args.get('tab', 'vote-management'),
+            game_state=game_state,
             now=datetime.now()
         )
     except Exception as e:
@@ -445,5 +445,42 @@ def toggle_voting():
         flash(f'Voting has been {status_text} successfully!', 'success')
     else:
         flash('Failed to toggle voting status.', 'danger')
+
+    return redirect_with_tab('admin.dashboard')
+
+
+@admin.route('/free-for-all', methods=['POST'])
+@admin_required
+def free_for_all():
+    if 'confirmation' not in request.form:
+        flash('Please confirm this action first.', 'danger')
+        return redirect(url_for('admin.dashboard', tab='game-control'))
+
+    # Use the service function
+    enable = 'free_for_all' in request.form
+    success = toggle_free_for_all(enable)
+
+    if success:
+        mode_status = "enabled" if enable else "disabled"
+        flash(f'Free-for-all mode has been {mode_status}.', 'success')
+    else:
+        flash('Failed to update free-for-all mode.', 'danger')
+
+    return redirect(url_for('admin.dashboard', tab='game-control'))
+
+
+@admin.route('/deny-team/<team_id>')
+@admin_required
+def deny_team_route(team_id):
+    """
+    Deny a pending team's registration.
+    """
+
+    success, result = deny_team(team_id)
+
+    if success:
+        flash(f'Team {result} has been denied', 'success')
+    else:
+        flash(f'Failed to deny team: {result}', 'error')
 
     return redirect_with_tab('admin.dashboard')

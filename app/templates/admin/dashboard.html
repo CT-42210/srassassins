@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Crimsassions - Admin Dashboard{% endblock %}
+{% block title %}{{ game_state.game_name }} - Admin Dashboard{% endblock %}
 
 {% block styles %}
 <style>
@@ -224,7 +224,10 @@
                                         </td>
                                         <td>{{ team.created_at.strftime('%Y-%m-%d') }}</td>
                                         <td>
-                                            <a href="{{ url_for('admin.approve_team', team_id=team.id, tab='team-management') }}" class="btn btn-sm btn-success">Accept</a>
+                                            <div class="action-buttons">
+                                                <a href="{{ url_for('admin.approve_team', team_id=team.id) }}?tab={{ active_tab }}" class="btn btn-sm btn-success">Accept</a>
+                                                <a href="{{ url_for('admin.deny_team_route', team_id=team.id) }}?tab={{ active_tab }}" class="btn btn-sm btn-danger">Deny</a>
+                                            </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -352,6 +355,43 @@
 
                                     <div class="text-center mt-3">
                                         <button type="submit" class="btn btn-primary">Update Threshold</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- free for all mode -->
+                        <div class="card admin-card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Free-For-All Mode</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Enable or disable free-for-all mode where every player can target any other player.</p>
+
+                                <form action="{{ url_for('admin.free_for_all') }}" method="POST" class="admin-action-form loading-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                    <div class="mb-3 form-check">
+                                        <input class="form-check-input" type="checkbox" id="free_for_all" name="free_for_all" value="true"
+                                               {% if game_state.free_for_all %}checked{% endif %}>
+                                        <label class="form-check-label" for="free_for_all">
+                                            <strong>Enable Free-for-all Mode</strong>
+                                        </label>
+                                        <div class="form-text text-warning">
+                                            <i class="fas fa-exclamation-triangle"></i> This will override team-based targeting. All alive players will be able to eliminate any other alive player.
+                                        </div>
+                                    </div>
+
+                                    <div class="confirmation-checkbox">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="ffa_confirmation" name="confirmation" value="yes" required>
+                                            <label class="form-check-label" for="ffa_confirmation">
+                                                I understand this action will change the targeting rules for all players.
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center mt-3">
+                                        <button type="submit" class="btn btn-primary">Update Setting</button>
                                     </div>
                                 </form>
                             </div>
