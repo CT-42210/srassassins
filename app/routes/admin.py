@@ -358,7 +358,7 @@ def execute_sql():
 
     if success:
         flash('SQL command executed successfully!', 'success')
-        return render_template('admin/sql_result.html', game_state=game_state, result=result, active_tab=get_active_tab())
+        return render_template('admin/sql-results.html', game_state=game_state, result=result, active_tab=get_active_tab())
     else:
         flash(f'SQL command failed: {result}', 'danger')
         return redirect_with_tab('admin.dashboard')

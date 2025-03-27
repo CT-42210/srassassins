@@ -3,6 +3,7 @@ import os
 import shutil
 
 from flask import current_app
+from sqlalchemy import text
 from werkzeug.security import check_password_hash
 
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
@@ -596,7 +597,7 @@ def execute_db_command(sql_command):
     """
     try:
         # Execute the command
-        result = db.session.execute(sql_command)
+        result = db.session.execute(text(sql_command))
         db.session.commit()
 
         # Convert result to a list of dicts
