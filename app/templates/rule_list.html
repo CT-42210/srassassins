@@ -12,13 +12,19 @@
 
 <hr>
 
-<h2>Game Rounds</h2>
+<h2>Game Logic</h2>
 <ul>
     <li>The game is divided into multiple rounds.</li>
     <li>Round start and end time/dates, along with how many rounds will be played, will be announced before.</li>
     <li>At the beginning of each round, teams are assigned a new target.</li>
-    <li>At the end of each round, if a team has eliminated their targets and has at least one member alive, they will continue on to the next round. Any eliminated team members will be revived for the next round.</li>
-    <li>At the end of each round, if a team fails to eliminate their targets, they are eliminated.</li>
+    <li>At the end of each round:
+        <ul>
+            <li>If a team has eliminated all of their targets, they move on. Any eliminated players are revived.</li>
+            <li>If a team has eliminated one of their targets, then they move on. Eliminated players are not revived.</li>
+            <li>If a team fails to eliminate any of their targets, their team is eliminated by the system.</li>
+        </ul>
+    </li>
+    <li>The final round will be a free for all, where teams are instructed to target all remaining players. Last team standing during the free for all wins 1st place. 2nd through 5th place is determined by the number of kills.</li>
 </ul>
 
 <hr>
@@ -39,7 +45,7 @@
         <ul>
             <li>All MBS Property (excluding the parking lot, see below).</li>
             <li>Any other school's property.</li>
-            <li>MBS Parking lot from 7:45am to 3:30pm. Only including the pavement. (The stairs, grass, and road are not considered the parking lot.)</li>
+            <li>MBS Parking lot from 7:45am to 2:45pm. Only including the pavement. (The stairs, grass, and road are not considered the parking lot.)</li>
             <li>The location of any competitive sport practice or competition (see sports section).</li>
             <li>The location of any work shift (see work section).</li>
         </ul>
@@ -53,7 +59,7 @@
     <li>After eliminating a player, the attacker must submit a kill confirmation through the game portal.</li>
     <li>The submission must include a video of the elimination.</li>
     <li>Other players in the game will vote to confirm or reject the elimination.</li>
-    <li>A minimum of {{ game_state.voting_threshold }} votes is required to confirm or reject the elimination.</li>
+    <li>A minimum of {{ game_state.voting_threshold }} votes is required to confirm or reject the elimination. This number can be changed by admin.</li>
     <li>Eliminations in blatant violation of the rules (such as in safe zones) will be rejected. Otherwise, it will be up to the players of the game to decide if a kill counts.</li>
 </ul>
 
@@ -95,9 +101,9 @@
 <h2>Houses and Functions</h2>
 <ul>
     <li>Houses are an exception to the no indoors rule.</li>
-    <li>If an attacker is invited into the targets home <strong>by the target themselves,</strong> then all tags are valid.</li>
-    <li>If an attacker is invited into another player's home, and their attacker is also invited, all tags are also valid.</li>
-    <Li>If a function happening inside a player's home has more than 15 other players (meaning people who are signed up in {{ game_state.game_name }}) then all kills are invalid.</Li>
+    <li>If an attacker is invited into the targets home <strong>by the target themselves,</strong> then all kills are valid.</li>
+    <li>If an attacker is invited into another player's home, and their attacker is also invited, all kills are also valid.</li>
+    <Li>If a function happening inside a player's home has more than 15 other players (meaning participants of {{ game_state.game_name }}), then all kills are invalid.</Li>
 </ul>
 
 <hr>
@@ -106,7 +112,7 @@
 <ul>
     <li>You cannot tag a player while in any car seat (front or back, driving or passenger).</li>
     <li>You can tag a player from the trunk of the car, only as long as the car is not being operated (meaning the driver's seat is empty).</li>
-    <Li>You can be tagged while sitting inside a car through an open door, so long as the attacker is in compliance with the above.</Li>
+    <Li>You can be tagged while sitting inside a car through an open door.</Li>
 </ul>
 
 <hr>
