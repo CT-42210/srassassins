@@ -259,6 +259,16 @@ def signup():
             file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], unique_filename)
             file.save(file_path)
 
+            if session.get('player_count') == 2:
+                send_admin_image(subject=f"New Team Signup {session.get('team_name')}",
+                                 text_body=f"Team Name: {session.get('team_name')}\n"
+                                           f"Player 1: {session.get('player1_name')}\n"
+                                           f"player 2: {session.get('player2_name')}", image_path=file_path)
+            else:
+                send_admin_image(subject=f"New Team Signup {session.get('team_name')}",
+                                 text_body=f"Team Name: {session.get('team_name')}\n"
+                                           f"Player 1: {session.get('player1_name')}", image_path=file_path)
+
             relative_path = f"uploads/{unique_filename}"
 
             # Then update the Team creation:
