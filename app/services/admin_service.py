@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
 from app.services.email_service import send_all_players_email
 from app.services.game_service import assign_targets, check_game_complete, increment_rounds, kill_teams, revive_players
+from app.services.admin_email_service import send_admin_image
 
 
 def verify_admin_password(password):
@@ -243,6 +244,20 @@ def accept_team(team_id):
 
     # Commit changes
     db.session.commit()
+
+    players = Player.query.filter_by(team_id=team.id).all()
+    player_names = [player.name for player in players]
+
+    # Send admin email with team photo
+    try:
+        send_admin_image(
+            subject=f"New Team Approved: {team.name}",
+            text_body=f"Team Name: {team.name}\n"
+                      f"Players: {', '.join(player_names)}",
+            image_path=os.path.join(current_app.config['UPLOAD_FOLDER'], team.photo_path.split('/')[1])
+        )
+    except Exception as e:
+        current_app.logger.error(f"Failed to send admin email: {str(e)}")
 
     # Log the event
     current_app.logger.info(f'Team {team.name} (ID: {team.id}) accepted into the game')
