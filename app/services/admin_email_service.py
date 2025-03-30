@@ -1,8 +1,12 @@
-import smtplib
+import datetime
 import os
+import smtplib
+from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
+
+from app.models import Team
+
 
 def send_admin_video(subject, text_body, image_path=None, video_path=None, recipients=[], html_body=None):
     from flask import current_app
@@ -184,4 +188,50 @@ def send_admin_image(subject, text_body, image_path, recipients=[], html_body=No
         return True
     except Exception as e:
         current_app.logger.error(f'Failed to send email with image: {str(e)}')
+        return False
+
+
+def send_admin_targets(teams):
+    """
+    Send an email to admin with all target assignments.
+
+    Args:
+        teams: List of teams with assigned targets
+    """
+    print("trace newround 5")
+    from flask import current_app
+    try:
+        from app.services.email_service import send_email
+
+        # Generate target assignment summary
+        assignment_list = []
+        for team in teams:
+            target_team = Team.query.get(team.target_id)
+            if target_team:
+                assignment_list.append(f"Team '{team.name}' → Team '{target_team.name}'")
+
+        # Create email content
+        subject = f"Target Assignments - {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        content = "Target Assignments:\n\n"
+        content += "\n".join(assignment_list)
+
+        # Get admin email from config
+        admin_email = current_app.config.get('ADMIN_EMAIL')
+        if not admin_email:
+            current_app.logger.error("Cannot send target assignments email: ADMIN_EMAIL not configured")
+            return False
+
+        # Send the email
+        send_email(
+            subject=subject,
+            recipients=[admin_email],
+            text_body=content,
+            html_body=None
+        )
+
+        current_app.logger.info(f"Target assignments email sent to admin")
+        return True
+
+    except Exception as e:
+        current_app.logger.error(f"Failed to send target assignments email: {str(e)}")
         return False

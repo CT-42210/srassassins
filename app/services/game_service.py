@@ -5,32 +5,32 @@ import random
 
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
 from app.services.email_service import send_kill_submission_notification
-# from app.services.instagram_service
-
+from app.services.admin_email_service import send_admin_targets
 
 def assign_targets():
     """
     Randomly assign target teams to each alive team.
-    
+
     Returns:
         bool: True if successful, False otherwise
     """
+    print("Trace newround 4")
     # Get all alive teams
     alive_teams = Team.query.filter_by(state='alive').all()
-    
+
     # If less than 2 teams are alive, can't assign targets
     if len(alive_teams) < 2:
         return False
-    
+
     # Shuffle the teams
     random.shuffle(alive_teams)
-    
+
     # Assign targets in a circular fashion
     for i in range(len(alive_teams)):
         current_team = alive_teams[i]
         target_team = alive_teams[(i + 1) % len(alive_teams)]
         current_team.target_id = target_team.id
-    
+
     # Log the action
     log = ActionLog(
         action_type='target_assignment',
@@ -38,12 +38,16 @@ def assign_targets():
         actor='system'
     )
     db.session.add(log)
-    
+
     # Commit changes
     db.session.commit()
-    
-    return True
 
+    # Send assignment summary to admin
+    print("Trace newround 4.5")
+    print(alive_teams)
+    send_admin_targets(alive_teams)
+
+    return True
 
 def kill_teams():
     game_state = GameState.query.first()
@@ -477,10 +481,11 @@ def schedule_round_transitions(app):
                     args=[app]
                 )
 
+
 def start_round(app=None):
     """
     Start the current round.
-    
+
     Args:
         app: Flask application instance (optional)
     """
@@ -491,6 +496,7 @@ def start_round(app=None):
     else:
         from app.services.admin_service import start_round as admin_start_round
         admin_start_round(increment=False)
+
 
 def end_round_start_next(app=None):
     """

@@ -236,6 +236,7 @@ def new_round():
     else:
         flash('Failed to start new round.', 'danger')
 
+    print("trace new round 1")
     return redirect(url_for('admin.dashboard', tab='game-control'))
 
 

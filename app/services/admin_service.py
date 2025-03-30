@@ -7,9 +7,8 @@ from sqlalchemy import text
 from werkzeug.security import check_password_hash
 
 from app.models import db, Team, Player, GameState, KillConfirmation, KillVote, ActionLog
-from app.services.email_service import send_all_players_email
-from app.services.game_service import assign_targets, check_game_complete, increment_rounds, kill_teams, revive_players
 from app.services.admin_email_service import send_admin_image
+from app.services.game_service import check_game_complete
 
 
 def verify_admin_password(password):
@@ -313,48 +312,50 @@ def change_game_state(new_state):
     return True
 
 
-def start_round(increment=False):
+def start_round(increment=True):
     """
-    Start a new round of the game.
+    Start a new game round.
 
     Args:
         increment (bool): Whether to increment the round number
 
     Returns:
-        bool: True if successful, False otherwise
+        tuple: (success, round_number)
     """
-    # Get game state
-    game_state = GameState.query.first()
+    print("trace newround 2")
+    try:
+        game_state = GameState.query.first()
 
-    # kill teams that did not eliminate the thing
-    if game_state.round_number == 0:  # do not run if game has not started yet
-        pass
-    else:
-        kill_teams()
-
-    #make sure winning team isnt decided by round change
-    if not check_game_complete():
-        # Assign targets to remaining teams
-        assign_targets()
-
-        # Increment round number if requested
         if increment:
+            from app.services.game_service import increment_rounds
             increment_rounds()
 
-        # Revive eliminated players in surviving teams
+        # Revive all players in alive teams for new round
+        from app.services.game_service import revive_players
         revive_players()
 
-        # Send notifications
-        send_all_players_email(
-            subject=f"Senior Assassin - Round {game_state.round_number} Started",
-            text_body=f"Round {game_state.round_number} has started! Log in to see your new target."
+        print("trace newround 3")
+        # assigns random targets
+        from app.services.game_service import assign_targets
+        assign_targets()
+
+        current_app.logger.info(f"Started round {game_state.round_number}")
+
+        # Log the action
+        log = ActionLog(
+            action_type='round_start',
+            description=f'Round {game_state.round_number} started',
+            actor='admin'
         )
+        db.session.add(log)
+        db.session.commit()
 
+        return True, game_state.round_number
 
-        # Log the event
-        current_app.logger.info(f'Started round {game_state.round_number}')
-
-        return True
+    except Exception as e:
+        current_app.logger.error(f"Failed to start round: {str(e)}")
+        db.session.rollback()
+        return False, None
 
 
 def set_round_schedule(round_start, round_end):

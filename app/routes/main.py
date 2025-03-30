@@ -110,7 +110,6 @@ def about():
     """
     Display information about the game and developer.
     """
-
+    from app.models import GameState
     game_state = GameState.query.first()
-
     return render_template('about.html', game_state=game_state, now=datetime.now())
