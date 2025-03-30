@@ -322,19 +322,18 @@ def start_round(increment=True):
     Returns:
         tuple: (success, round_number)
     """
-    print("trace newround 2")
     try:
         game_state = GameState.query.first()
 
         if increment:
+            # Revive all players in alive teams for new round
+            if game_state.round_number != 0:
+                from app.services.game_service import game_logic
+                game_logic()
+
             from app.services.game_service import increment_rounds
             increment_rounds()
 
-        # Revive all players in alive teams for new round
-        from app.services.game_service import revive_players
-        revive_players()
-
-        print("trace newround 3")
         # assigns random targets
         from app.services.game_service import assign_targets
         assign_targets()

@@ -14,7 +14,6 @@ def assign_targets():
     Returns:
         bool: True if successful, False otherwise
     """
-    print("Trace newround 4")
     # Get all alive teams
     alive_teams = Team.query.filter_by(state='alive').all()
 
@@ -43,49 +42,10 @@ def assign_targets():
     db.session.commit()
 
     # Send assignment summary to admin
-    print("Trace newround 4.5")
     print(alive_teams)
     send_admin_targets(alive_teams)
 
     return True
-
-def kill_teams():
-    game_state = GameState.query.first()
-
-    # Set round start time
-    game_state.round_start = datetime.datetime.utcnow()
-    teams = Team.query.filter_by(state='alive').all()
-
-    # lists of teams and players to be eliminated
-    eliminated_teams = []
-    eliminated_players = []
-
-    # find teams whos targets are still alive and append them to the list
-    for team in teams:
-        target = team.target_id
-        target_state = Team.query.get(target).state
-        if target_state == 'alive':
-            eliminated_teams.append(team)
-            for player in team.players:
-                eliminated_players.append(player)
-
-    # kill teams and log
-    for team in eliminated_teams:
-        team.state = 'dead'
-
-        log = ActionLog(
-            action_type='team_elimination',
-            description=f'team {team.name} eliminated in round {game_state.round_number}',
-            actor='system'
-        )
-        db.session.add(log)
-
-    # kill players
-    for player in eliminated_players:
-        player.state = 'dead'
-
-    # Save Changes
-    db.session.commit()
 
 
 def increment_rounds():
@@ -94,24 +54,97 @@ def increment_rounds():
     game_state.round_number += 1
 
 
-def revive_players():
+def game_logic():
+    """
+    Implements game rules for round transitions:
+    - If a team eliminated all their targets, they move on and any eliminated players are revived
+    - If a team eliminated at least one target, they move on (eliminated players stay dead)
+    - If a team didn't eliminate any targets, the entire team is eliminated
+    """
     game_state = GameState.query.first()
-    teams = Team.query.filter_by(state='alive').all()
-    for team in teams:
-        for player in team.players:
-            if not player.is_alive:
-                player.state = 'alive'
+    alive_teams = Team.query.filter_by(state='alive').all()
 
-                # Log the revival
-                log = ActionLog(
-                    action_type='player_revival',
-                    description=f'Player {player.name} revived for round {game_state.round_number}',
-                    actor='system'
-                )
-                db.session.add(log)
+    # Add debug logs
+    print(f"Game logic - Round {game_state.round_number} - Processing {len(alive_teams)} alive teams")
 
-    # Commit changes
+    # Track teams to be eliminated
+    teams_to_eliminate = []
+
+    # Check each team's performance
+    for team in alive_teams:
+        # Get the team's current target
+        target_team = Team.query.get(team.target_id) if team.target_id else None
+        if not target_team:
+            print(f"Team {team.name} has no target, skipping")
+            continue
+
+        # Get target team's players
+        target_players = Player.query.filter_by(team_id=target_team.id).all()
+
+        # Count how many of the target's players were eliminated (by any means)
+        eliminated_count = 0
+        total_targets = len(target_players)
+
+        print(f"Team {team.name} targeting {target_team.name} with {total_targets} players")
+
+        for target_player in target_players:
+            # Check if this player is eliminated (by any means - not just through obituaries)
+            if not target_player.is_alive:
+                eliminated_count += 1
+                print(f"Found eliminated player: {target_player.name}")
+
+        print(f"Team {team.name} eliminated {eliminated_count}/{total_targets} targets")
+
+        # Apply game rules
+        if eliminated_count == 0:
+            # Rule: Team didn't eliminate any targets, they're eliminated
+            print(f"Team {team.name} eliminated 0 targets - marking for elimination")
+            teams_to_eliminate.append(team)
+        elif eliminated_count == total_targets:
+            # Rule: Team eliminated all targets, revive any dead players
+            print(f"Team {team.name} eliminated all targets - reviving dead members")
+            for player in Player.query.filter_by(team_id=team.id).all():
+                if not player.is_alive:
+                    player.state = 'alive'
+                    print(f"Reviving player {player.name}")
+
+                    # Log the revival
+                    log = ActionLog(
+                        action_type='player_revival',
+                        description=f'Player {player.name} revived for round {game_state.round_number}',
+                        actor='system'
+                    )
+                    db.session.add(log)
+        else:
+            # Rule: Team eliminated some but not all targets - they move on but dead players stay dead
+            print(f"Team {team.name} eliminated some targets - advancing without revival")
+
+    # Process team eliminations
+    print(f"Processing {len(teams_to_eliminate)} teams for elimination")
+    for team in teams_to_eliminate:
+        team.state = 'dead'
+        print(f"Marking team {team.name} as dead")
+
+        # Mark all team members as dead - ONLY for the teams that failed
+        team_players = Player.query.filter_by(team_id=team.id).all()
+        for player in team_players:
+            player.state = 'dead'
+            print(f"Marking player {player.name} from team {team.name} as dead")
+
+        # Log the team elimination
+        log = ActionLog(
+            action_type='team_elimination',
+            description=f'Team {team.name} eliminated in round {game_state.round_number} for failing to eliminate targets',
+            actor='system'
+        )
+        db.session.add(log)
+
+    # Commit all changes
     db.session.commit()
+    print("Game logic complete - changes committed")
+
+    check_game_complete()
+
 
 def submit_kill(victim_id, attacker_id, kill_time, video_path):
     """

@@ -198,7 +198,6 @@ def send_admin_targets(teams):
     Args:
         teams: List of teams with assigned targets
     """
-    print("trace newround 5")
     from flask import current_app
     try:
         from app.services.email_service import send_email
