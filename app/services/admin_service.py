@@ -748,3 +748,55 @@ def deny_team(team_id):
     except Exception as e:
         db.session.rollback()
         return False, str(e)
+
+
+def send_mass_email_service(subject, content):
+    """
+    Send a single email to all players with their email addresses visible to each other.
+
+    Args:
+        subject (str): Email subject
+        content (str): Email content
+
+    Returns:
+        tuple: (success, message)
+    """
+    try:
+        # Get all players with email addresses
+        players = Player.query.filter(Player.email != None).all()
+        if not players:
+            current_app.logger.warning("No players with email addresses found")
+            return False, "No players with email addresses found"
+
+        # Import email service
+        from app.services.email_service import send_email
+
+        # Collect all email addresses
+        email_addresses = [player.email for player in players if player.email]
+
+        if not email_addresses:
+            return False, "No valid email addresses found"
+
+        # Send a single email with all recipients in TO field
+        send_email(
+            subject=subject,
+            recipients=email_addresses,  # Pass the list of emails directly
+            text_body=content,
+            html_body=None
+        )
+
+        current_app.logger.info(f"Mass email sent to {len(email_addresses)} players: {subject}")
+
+        # Log the action
+        log = ActionLog(
+            action_type='mass_email',
+            description=f'Mass email sent to {len(email_addresses)} players: {subject}',
+            actor='admin'
+        )
+        db.session.add(log)
+        db.session.commit()
+
+        return True, f"Email sent successfully to {len(email_addresses)} players"
+    except Exception as e:
+        current_app.logger.error(f"Failed to send mass email: {str(e)}")
+        return False, str(e)

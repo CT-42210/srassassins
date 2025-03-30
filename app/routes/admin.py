@@ -8,7 +8,7 @@ from app.services.admin_service import (
     change_game_state, start_round, set_round_schedule,
     toggle_team_state, toggle_player_state, force_vote_decision,
     backup_database, execute_db_command, wipe_game, update_voting_threshold,
-    toggle_voting_status, toggle_free_for_all
+    toggle_voting_status, toggle_free_for_all, send_mass_email_service
 )
 from app.services.email_service import send_team_approval_notification
 
@@ -382,28 +382,14 @@ def send_mass_email():
         flash('Email subject and content are required.', 'danger')
         return redirect_with_tab('admin.dashboard')
 
-    # Get all players with email addresses
-    players = Player.query.filter(Player.email != None).all()
-    if not players:
-        flash('No players with email addresses found.', 'danger')
-        return redirect_with_tab('admin.dashboard')
+    # Use the service function
+    success, message = send_mass_email_service(subject, content)
 
-    # Import email service
-    from app.services.email_service import send_custom_email
+    if success:
+        flash(message, 'success')
+    else:
+        flash(f'Failed to send email: {message}', 'danger')
 
-    success_count = 0
-    for player in players:
-        if player.email:
-            try:
-                send_custom_email(player.email, subject, content)
-                success_count += 1
-            except Exception as e:
-                current_app.logger.error(f"Failed to send email to {player.email}: {str(e)}")
-
-    # Log the action
-    db.session.commit()
-
-    flash(f'Email sent successfully to {success_count} players!', 'success')
     return redirect_with_tab('admin.dashboard')
 
 
