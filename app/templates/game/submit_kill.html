@@ -24,7 +24,8 @@
                     
                     <form method="post" action="{{ url_for('game.submit_kill_route') }}" enctype="multipart/form-data" class="kill-submission-form loading-form" id="kill-submit-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        
+
+                        {% if not game_state.free_for_all %}
                         <div class="mb-4">
                             <label class="form-label">Target Team</label>
                             <div class="card">
@@ -33,6 +34,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                         
                         <div class="mb-4">
                             <label for="victim_id" class="form-label">Select Eliminated Player</label>

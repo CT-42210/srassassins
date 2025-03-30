@@ -46,15 +46,25 @@ def home():
     team = Team.query.get(current_user.team_id)
 
     # Get teammate if exists
-    teammate = Player.query.filter_by(team_id=team.id).filter(Player.id != current_user.id).first()
 
     # Get target team and players if assigned
     target_team = None
     target_players = []
 
+    teammate = Player.query.filter_by(team_id=team.id).filter(Player.id != current_user.id).first()
+
     if game_state.free_for_all:
-        # In free-for-all, all alive players except current user and partner are targets
-        target_players = Player.query.filter(Player.state == 'alive', Player.id != current_user.id, Player.id != teammate.id).all()
+        # In free-for-all, all alive players except current user and teammate are targets
+        if teammate is not None:
+            # If teammate exists, exclude both current user and teammate
+            target_players = Player.query.filter(Player.state == 'alive',
+                                               Player.id != current_user.id,
+                                               Player.id != teammate).all()
+        else:
+            # If no teammate, just exclude current user
+            target_players = Player.query.filter(Player.state == 'alive',
+                                               Player.id != current_user.id).all()
+        print(target_players)
     else:
         # Regular team-based targeting
         if team.target_id:
@@ -112,16 +122,22 @@ def submit_kill_route():
     if game_state.free_for_all:
         # In free-for-all, all alive players except current user are targets
         teammate = Player.query.filter_by(team_id=team.id).filter(Player.id != current_user.id).first()
-        target_players = Player.query.filter(Player.state == 'alive', Player.id != current_user.id, Player.id != teammate.id).all()
-    else:
-        # Regular team-based targeting
-        if team.target_id:
-            target_team = Team.query.get(team.target_id)
-            if target_team:
-                target_players = [p for p in Player.query.filter_by(team_id=target_team.id).all() if p.is_alive]
+
+        # Check if teammate exists before trying to access teammate.id
+        if teammate:
+            target_players = Player.query.filter(
+                Player.state == 'alive',
+                Player.id != current_user.id,
+                Player.id != teammate.id
+            ).all()
+        else:
+            target_players = Player.query.filter(
+                Player.state == 'alive',
+                Player.id != current_user.id
+            ).all()
 
     # If no targets, redirect back to home
-    if not target_team or not target_players:
+    if (not game_state.free_for_all and not target_team) or not target_players:
         flash('You have no valid targets.', 'danger')
         return redirect(url_for('game.home'))
 

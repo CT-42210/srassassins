@@ -113,16 +113,18 @@
         </div>
         
         <div class="secure-section blurred">
-            {% if target_team and team.is_alive %}
-                <h3>Your Target</h3>
+            {% if (target_team or game_state.free_for_all) and team.is_alive %}
+                <h3>Your Targets</h3>
                 <div class="target-info">
-                    <h4>Team {{ target_team.name }}</h4>
+                    {% if not game_state.free_for_all %}
+                    <h4>{{ target_team.name }}</h4>
                     <p>Status: 
                         <span class="player-status {% if target_team.is_alive %}status-alive{% else %}status-dead{% endif %}">
                             {{ target_team.state|upper }}
                         </span>
                     </p>
-                    
+                    {% endif %}
+
                     <h5 class="mt-4">Target Players:</h5>
                     {% for player in target_players %}
                     <div class="card mb-3">
