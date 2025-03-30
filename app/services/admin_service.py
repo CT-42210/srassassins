@@ -285,6 +285,9 @@ def change_game_state(new_state):
     # Update state
     game_state.state = new_state
 
+    if new_state == 'pre':
+        game_state.round_number = 0
+
     # Special handling for transitioning to 'live'
     if new_state == 'live' and old_state == 'pre':
         # Auto-start round 1

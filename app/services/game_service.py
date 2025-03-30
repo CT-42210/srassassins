@@ -42,7 +42,6 @@ def assign_targets():
     db.session.commit()
 
     # Send assignment summary to admin
-    print(alive_teams)
     send_admin_targets(alive_teams)
 
     return True
@@ -159,6 +158,7 @@ def submit_kill(victim_id, attacker_id, kill_time, video_path):
     Returns:
         KillConfirmation: Created kill confirmation, or None if failed
     """
+    print("trace")
     # Get game state
     game_state = GameState.query.first()
     
@@ -172,17 +172,18 @@ def submit_kill(victim_id, attacker_id, kill_time, video_path):
     # Check if players are alive
     if not victim.is_alive or not attacker.is_alive:
         return None
+
+    # check if free for all is enabled
+    if not game_state.free_for_all:
+        # Check if victim's team is the attacker's target
+        attacker_team = Team.query.get(attacker.team_id)
+        victim_team = Team.query.get(victim.team_id)
     
-    # Check if victim's team is the attacker's target
-    attacker_team = Team.query.get(attacker.team_id)
-    victim_team = Team.query.get(victim.team_id)
-    
-    if attacker_team.target_id != victim_team.id:
-        return None
+        if attacker_team.target_id != victim_team.id:
+            return None
 
     existing_kill = KillConfirmation.query.filter_by(
         victim_id=victim_id,
-        attacker_id=attacker_id,
         status='pending'
     ).first()
 

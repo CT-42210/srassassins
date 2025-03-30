@@ -59,12 +59,11 @@ def home():
             # If teammate exists, exclude both current user and teammate
             target_players = Player.query.filter(Player.state == 'alive',
                                                Player.id != current_user.id,
-                                               Player.id != teammate).all()
+                                               Player.id != teammate.id).all()
         else:
             # If no teammate, just exclude current user
             target_players = Player.query.filter(Player.state == 'alive',
                                                Player.id != current_user.id).all()
-        print(target_players)
     else:
         # Regular team-based targeting
         if team.target_id:
@@ -135,9 +134,15 @@ def submit_kill_route():
                 Player.state == 'alive',
                 Player.id != current_user.id
             ).all()
+    else:
+        # Regular team-based targeting
+        if team.target_id:
+            target_team = Team.query.get(team.target_id)
+            if target_team:
+                target_players = Player.query.filter_by(team_id=target_team.id).all()
 
     # If no targets, redirect back to home
-    if (not game_state.free_for_all and not target_team) or not target_players:
+    if not target_players:
         flash('You have no valid targets.', 'danger')
         return redirect(url_for('game.home'))
 
@@ -173,7 +178,7 @@ def submit_kill_route():
         if file.filename == '':
             flash('No video selected.', 'danger')
             return render_template('game/submit_kill.html', target_team=target_team, target_players=target_players,
-                                   game_state=game_state,now=datetime.now())
+                                   game_state=game_state, now=datetime.now())
 
         # Check if file has allowed extension
         if not allowed_file(file.filename):
@@ -185,9 +190,7 @@ def submit_kill_route():
         filename = secure_filename(file.filename)
         file_ext = filename.rsplit('.', 1)[1].lower()
         unique_filename = f"/kill_{uuid.uuid4().hex}.{file_ext}"
-        print(current_app.config['UPLOAD_FOLDER'] + unique_filename)
         file_path = current_app.config['UPLOAD_FOLDER'] + unique_filename
-        print(file_path)
         file.save(file_path)
 
         # reformat and compress video
@@ -222,7 +225,7 @@ def submit_kill_route():
             flash('Kill submitted successfully and pending confirmation.', 'success')
 
             try:
-                send_admin_video(f"{victim} tagged by {current_user.name}",
+                send_admin_video(f"{victim.name} tagged by {current_user.name}",
                                  f"attacker ID {current_user.id}\n"
                                  f"victim ID: {victim_id}\n"
                                  f"time of kill: {kill_time}", video_path=file_path)
