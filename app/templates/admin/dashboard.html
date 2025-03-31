@@ -694,6 +694,18 @@
                                         View game state
                                     </a>
                                     <a href="#" class="list-group-item list-group-item-action"
+                                       onclick="document.getElementById('sql_command').value='UPDATE players SET field = \'data\', WHERE id = \'id\';'; return false;">
+                                        Edit player
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action"
+                                       onclick="document.getElementById('sql_command').value='UPDATE teams SET field = \'data\', WHERE id = \'id\';'; return false;">
+                                        Edit teams
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action"
+                                       onclick="document.getElementById('sql_command').value='UPDATE game_state SET field = \'data\';'; return false;">
+                                        Edit Game State
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action"
                                        onclick="document.getElementById('sql_command').value='SELECT * FROM kill_confirmations ORDER BY created_at DESC LIMIT 20;'; return false;">
                                         View recent kill confirmations
                                     </a>
