@@ -1,0 +1,14 @@
+hello ___.
+
+I'm Nick, and I go to Mobeard. I was fed up with the BS that comes from running a senior assassin game so I built an app to manage it for me, and I am reaching out to ask if your school wants to use it too.
+
+The app has a couple main features:
+one, it does the brute work for you- a computer manually shuffles teams and assigns targets. It can also automatically eliminate teams for whatever reason (like if they don't get all their targets out).
+The second main feature is a voting system. You can disable it if necessary, but allowing people to vote makes sure that a particularly bitchy admin cant ruin the game for everyone.
+Third, it allows the admin to play the game. because a computer randomizes the teams, no one person, even the admin, has information that anyone else doesn't. I am sure that your game is far more competitive than mine, and that no one probably wants to sit out and spend hours in spreadsheets managing it all.
+
+You can check out my school's deployment right now at https://crimsassions.com . The rules, game logic, and whatever else is completely customizable to your school (with some exceptions).
+Here is a youtube playlist with videos demonstrating how it works too. https://youtu.be/4kNHCQOm8bM?list=PLK0l1W9vmPjd8tsnRSJYHR8Z54zKtbgpC
+I need about $200 to host the app. we can figure price out after that.
+
+Let me know if your interested. Cheers
