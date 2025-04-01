@@ -35,7 +35,7 @@ def login():
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form.get('email').lower()
         password = request.form.get('password')
 
         # Check if it's an admin login
@@ -152,7 +152,7 @@ def signup():
         # Step 3: Enter player one information
         if request.method == 'POST':
             player_name = request.form.get('player_name')
-            player_email = request.form.get('player_email')
+            player_email = request.form.get('player_email').lower()
             player_phone = request.form.get('player_phone')
             player_address = request.form.get('player_address')
             player_password = request.form.get('player_password')
@@ -193,7 +193,7 @@ def signup():
         # Step 4: Enter player two information
         if request.method == 'POST':
             player_name = request.form.get('player_name')
-            player_email = request.form.get('player_email')
+            player_email = request.form.get('player_email').lower()
             player_phone = request.form.get('player_phone')
             player_address = request.form.get('player_address')
             player_password = request.form.get('player_password')
