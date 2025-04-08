@@ -49,7 +49,7 @@ def assign_targets():
 
 def increment_rounds():
     game_state = GameState.query.first()
-    game_state.round_start = datetime.datetime.utcnow()
+    game_state.round_start = datetime.datetime.now()
     game_state.round_number += 1
 
 
@@ -198,7 +198,7 @@ def submit_kill(victim_id, attacker_id, kill_time, video_path):
         round_number=game_state.round_number,
         video_path=video_path,
         status='pending',
-        expiration_time=datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        expiration_time=datetime.datetime.now() + datetime.timedelta(hours=24)
     )
     
     db.session.add(kill_confirmation)
@@ -243,7 +243,7 @@ def vote_on_kill(kill_confirmation_id, voter_id, vote):
         return False, "Kill confirmation is no longer pending"
     
     # Check if vote has expired
-    if kill_confirmation.expiration_time < datetime.datetime.utcnow():
+    if kill_confirmation.expiration_time < datetime.datetime.now():
         # Auto-reject expired confirmations
         kill_confirmation.status = 'rejected'
         
@@ -430,7 +430,7 @@ def get_kill_confirmations_for_voter(voter_id):
         if kill.id not in voted_ids 
         and kill.victim_id != voter_id 
         and kill.attacker_id != voter_id
-        and kill.expiration_time > datetime.datetime.utcnow()
+        and kill.expiration_time > datetime.datetime.now()
     ]
 
 def get_leaderboard():
@@ -493,7 +493,7 @@ def schedule_round_transitions(app):
         
         # If round start/end times are set and game is live, schedule transitions
         if game_state.state == 'live' and game_state.round_start and game_state.round_end:
-            now = datetime.datetime.utcnow()
+            now = datetime.datetime.now()
             
             # Schedule round start if it's in the future
             if game_state.round_start > now:

@@ -569,7 +569,11 @@
                                             <span class="text-success">{{ confirmation.approve_votes }}</span> /
                                             <span class="text-danger">{{ confirmation.reject_votes }}</span>
                                         </td>
-                                        <td>{{ confirmation.expiration_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <span class="countdown-timer" data-expiration="{{ confirmation.expiration_time.isoformat() }}">
+                                                {{ confirmation.expiration_time.strftime('%Y-%m-%d %H:%M') }}
+                                            </span>
+                                        </td>
                                         <td class="action-buttons">
                                             <a href="{{ url_for('admin.view_kill_admin', kill_confirmation_id=confirmation.id, tab='vote-management') }}" class="btn btn-sm btn-info">View Video</a>
                                             <a href="{{ url_for('admin.force_vote', kill_confirmation_id=confirmation.id, decision='approve', tab='vote-management') }}" class="btn btn-sm btn-success">Approve</a>
@@ -962,5 +966,33 @@
             roundEndInput.value = formatDatetimeLocal(nextWeek);
         }
     });
+
+function updateCountdowns() {
+    const countdowns = document.querySelectorAll('.countdown-timer');
+    const now = new Date();
+
+    countdowns.forEach(element => {
+        const expirationTime = new Date(element.dataset.expiration);
+        const timeRemaining = expirationTime - now;
+
+        if (timeRemaining <= 0) {
+            element.innerHTML = '<span class="text-danger">Expired</span>';
+        } else {
+            // Calculate hours, minutes, seconds
+            const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            // Format the countdown display
+            element.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+        }
+    });
+}
+
+// Update countdowns every second
+document.addEventListener('DOMContentLoaded', function() {
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+});
 </script>
 {% endblock %}
