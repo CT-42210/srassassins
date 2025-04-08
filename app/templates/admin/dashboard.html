@@ -67,6 +67,23 @@
         display: flex;
         gap: 8px;
     }
+
+    .countdown-timer {
+        display: inline-block;
+        min-width: 110px;
+        text-align: center;
+        line-height: 1.2;
+        vertical-align: middle;
+        margin: 0;
+        padding: 0;
+    }
+
+    .countdown-fixed {
+        font-family: monospace;
+        white-space: nowrap;
+        display: inline-block;
+        vertical-align: middle;
+    }
 </style>
 {% endblock %}
 
@@ -983,8 +1000,8 @@ function updateCountdowns() {
             const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-            // Format the countdown display
-            element.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+            // Format with zero-padding
+            element.innerHTML = `<span class="countdown-fixed">${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s</span>`;
         }
     });
 }
